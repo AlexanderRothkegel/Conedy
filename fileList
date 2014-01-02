@@ -13,10 +13,6 @@ Scanner.ll.begin
 Scanner.ll.end
 addNewNode.py
 baseType.h
-<<<<<<< HEAD
-=======
-buildWindows.bat
->>>>>>> 394e3233d98893f3b537b6006f0911b0d85f5840
 command.cpp
 command.h
 commandLineArguments.cpp
