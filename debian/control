@@ -2,9 +2,9 @@ Source: conedy
 Section: devel
 Priority: extra
 Maintainer: Alexander Rothkegel <rothkegel@uni-bonn.de>
-Build-Depends: debhelper (>= 7), cdbs, python-all-dev, boost-build | libboost-dev (>=1.46),libgsl0-dev, libboost-dev, libboost-python-dev, libboost-iostreams-dev, libz-dev, python-support, bisonc++, flex , texlive-latex-base, python-sphinx, texlive-latex-recommended, texlive-latex-extra, texlive-fonts-recommended, vim-common, dvipng
+Build-Depends: debhelper (>= 7), cdbs, python-all-dev, boost-build | libboost-dev (>=1.46),libgsl0-dev, libboost-dev, libboost-python-dev, libboost-iostreams-dev, libz-dev, python-support, bisonc++, flex , vim-common
 Standards-Version: 3.7.3
-Homepage: http://www.google.de
+Homepage: http://www.conedy.org
 
 Package: conedy
 Architecture: any
@@ -14,10 +14,15 @@ Description: scientific tool for numerical integration of dynamical networks
 
 Package: conedy-src
 Architecture: any
-Depends: python-all-dev, libgsl0-dev, boost-build | libboost-dev (>=1.46), libboost-dev, libboost-python-dev, libboost-iostreams-dev, libz-dev, python-support, bisonc++, flex, , make 
+Depends: python-all-dev, libgsl0-dev, boost-build | libboost-dev (>=1.46), libboost-dev, libboost-python-dev, libboost-iostreams-dev, libz-dev, python-support, bisonc++, flex,  make 
 Description: recompilation support for conedy
 
 Package: python-conedy
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, make
 Description: python-binding for conedy
+
+Package: conedy-doc
+Architecture: any
+Depends:  texlive-latex-base, python-sphinx, texlive-latex-recommended, texlive-latex-extra, texlive-fonts-recommended, dvipng
+Description: documentation for conedy
