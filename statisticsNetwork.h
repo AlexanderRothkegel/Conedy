@@ -15,63 +15,66 @@ namespace conedy
 	{
 		public:
 			
-			void printStatistics ();
-			void printNodeStatistics();
 
+			//! prints debug information to the console.
+			void printNodeStatistics(nodeBlueprint *n = network::stdNode);
+
+			//! returns true if the network has only one connected component. (works only for undirected networks at the moment.)
 			bool isConnected();
 
+			//! returns the degree of node v
 			nodeDescriptor degree (nodeDescriptor v) { return node::theNodes[v]->degree(); }
-			double meanDegree() { return meanOutDegree();}
 
-			baseType meanInDegree ();
-			baseType meanOutDegree ();
+			//! returns the mean degree of the network
+			baseType meanDegree ();
 
+			//! return the in-degree of node n
 			int inDegree(nodeDescriptor n);
+
+			//! return the out-degree of node n
 			int outDegree(nodeDescriptor n);
 
+			//! returns the mean clustering coefficient
 			baseType meanClustering();
+
+			//! obsolete ?
 			void printStatistics ( string s );
-			void dijkstra( vector<baseType>& ret, nodeList vl, unsigned int v);
+
+			//! returns the mean path length as determined by Dijkstra's algorithm
 			baseType meanPathLength();
-//			baseType meanDistanceMult();
+
+			//! returns the mean weight of connections in th network
+			baseType meanWeight();
+
 			void degreeCentrality ( string filename );
 			void closenessCentrality ( string filename );
 			void betweennessCentrality ( string filename );
 
 
-
-			baseType meanWeight();
+         void saveAdjacencyMatrix (string fileName);
 
 			unsigned int countEdges (edgeVirtual *e);
-
-
-//			void weightDistribution ( string fileName)
 
 			void inDegreeDistributionToFile ( string fileName );
 
 			void saveAdjacencyList(string fileName);
 			void saveGraphML(string fileName);
 
-         void saveAdjacencyMatrix (string fileName);
 
-
-			void loadGraphML(string fileName) { throw "loadGraphML is a stub !";}
+//			void loadGraphML(string fileName) { throw "loadGraphML is a stub !";}
 
 			void printAdjacencyList();
 
 			void outDegreeDistributionToFile ( string fileName );
 
+			// obsolete ?
 			double networkSize();
 
+			void dijkstra( vector<baseType>& ret, nodeList vl, unsigned int v);
 
 			vector<unsigned int> inDegreeDistribution();
 			vector<int> outDegreeDistribution();
-			void print ( int s )
-			{
-				cout << s << flush; cout << ( char ) 8; if ( s > 9 ) cout << ( char ) 8;;
 
-
-			};
 
 			statisticsNetwork() {};
 

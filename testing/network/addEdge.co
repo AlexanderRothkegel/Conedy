@@ -2,10 +2,21 @@ network N;
 
 
 N.addNode(node());
-N.addNode(node());
+N.addNode();
 
 N.addEdge(0,1,weightedEdge(0.3));
+N.addEdge(1,0,staticWeightedEdge(0.2));
+
+N.printNodeStatistics();
 
 
+undirectedNetwork uN;
 
-N.saveAdjacencyList("output/addEdge.co.adjList");
+int sourceNode = uN.addNode (node());
+int targetNode = uN.addNode (node());
+
+#addEdge connects nodes in undirected networks also in the opposite direction.
+uN.addEdge (sourceNode,targetNode,weightedEdge (1.0));
+
+print "linkStrength (should be 1.0):" + uN.linkStrength (sourceNode,targetNode) + newline;
+

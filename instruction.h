@@ -1,24 +1,16 @@
 #ifndef instruction_h
 #define instruction_h instruction_h
 
-#include <map>
 #include <string>
 #include <iostream>
+#include <iomanip>
+#include <list>
 
-#include "stream.h"
-//#include "fullNetwork.h"
 
 #include "commandLineArguments.h"
 #include "gslNoise.h"
-//#include "network.h"
-//#include "nodeImplement.h"
-
-
 #include "globals.h"
-
-#include <iomanip>
 #include "expression.h"
-#include <list>
 
 
 //! Basis-Klasse für alle Instructionen.
@@ -35,7 +27,7 @@ class systemInstruction : public instruction
 			if (system(theCommand->evaluate().c_str()))
 			{
 				cout <<  "system Command Failed!" << endl;
-				//				throw theCommand.c_str();
+								throw theCommand->evaluate().c_str();
 			}
 		}
 };

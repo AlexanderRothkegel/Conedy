@@ -25,7 +25,7 @@ print newline;
 
 
 int j = N.addNode(roessler());
-N.addEdge(i, j, 1.0);
+N.addEdge(i, j, weightedEdge (1.0));
 
 nodeVerbosity = 2;
 edgeVerbosity = 1;

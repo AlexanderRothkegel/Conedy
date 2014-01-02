@@ -3,7 +3,6 @@ FlexLexer.h
 Jamroot
 LICENSE
 Makefile
-addedNodes.sum.old
 Parser.h
 Parser.ih
 Parser.yy.declaration
@@ -14,6 +13,10 @@ Scanner.ll.begin
 Scanner.ll.end
 addNewNode.py
 baseType.h
+<<<<<<< HEAD
+=======
+buildWindows.bat
+>>>>>>> 394e3233d98893f3b537b6006f0911b0d85f5840
 command.cpp
 command.h
 commandLineArguments.cpp
@@ -32,9 +35,13 @@ dynNode.h
 edge.h
 eventHandler.cpp
 eventHandler.h
+expression.h
 fileList
 fullNetwork.cpp
 fullNetwork.h
+fullNetworkWithNodes.cpp
+fullNetworkWithNodes.h
+generateSourceCodeWindows.bat
 globals.cpp
 globals.h
 gslNoise.cpp
@@ -47,6 +54,9 @@ instruction.h
 integrator.h
 ioNode.cpp
 ioNode.h
+lyapunov.cpp
+lyapunov.h
+makeDocstringsWindows.py
 manpage.1
 mapNode.cpp
 mapNode.h
@@ -56,6 +66,8 @@ network.neu
 networkConstants.h
 neuroPython.cpp
 neuroPython.h
+neuroPythonNodes.cpp
+neuroPythonNodes.h
 node.cpp
 node.h
 nodeImplement.h
@@ -64,12 +76,9 @@ odeNode.cpp
 odeNode.h
 params.cpp
 params.h
+parserSemantic.h
 pco.h
 pcoDelay.h
-expression.h
-parserSemantic.h
-lyapunov.h
-lyapunov.cpp
 priorityQueue.cpp
 priorityQueue.h
 pulseCoupledExcitatoryNeuron.cpp
@@ -77,8 +86,6 @@ pulseCoupledExcitatoryNeuron.h
 pulseCoupledPhaseOscillator.cpp
 pulseCoupledPhaseOscillator.h
 recompileConedy
-recompilePython-Conedy
-registerStandards.h
 sde.h
 sdeNode.cpp
 sdeNode.h
@@ -92,6 +99,7 @@ stdOdeIntegrator.cpp
 stdOdeIntegrator.h
 stdSdeIntegrator.cpp
 stdSdeIntegrator.h
-stream.h
 testNode1.cfg
 todo
+unsupportedEdges.h
+userConfig.h.tmpl

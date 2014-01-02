@@ -2,7 +2,7 @@
 
 #include "createNetwork.h"
 
-#include "specialNodes.h"
+//#include "specialNodes.h"
 #include "pulseCoupledPhaseOscillator.h"
 #include "nodeImplement.h"
 #include "statisticsNetwork.h"
@@ -23,80 +23,13 @@ namespace conedy {
 
 			}
 
-	void createNetwork::observeEventSignatureTimes( string fileName,nodeDescriptor eventNumber) {
-		nodeBlueprint* nod = new nodeVirtualEdges<timeNode<baseType> >();
-		nodeDescriptor timeNodeNumber = addNode ( nod );
-		delete nod;
-
-		nod = new  nodeVirtualEdges<streamOutNode>(fileName);
-		nodeDescriptor streamOutNodeNumber = addNode(nod);
-		streamOutNode *s = dynamic_cast<streamOutNode*>( nodeBlueprint::theNodes[streamOutNodeNumber]);
-
-		eventHandler::insertVisiterAtSignature(bind(&streamOutNode::evolve,s, 0.0),eventNumber);
-		delete nod;
-
-
-
-
-		network::addEdge( streamOutNodeNumber, timeNodeNumber);
 
 
 
 
 
-	}
 
 
-
-
-
-	void createNetwork::observeEventTimesEquals( string fileName,nodeDescriptor eventNumber) {
-
-		nodeBlueprint* nod = new nodeVirtualEdges<timeNode<baseType> >();
-		nodeDescriptor timeNodeNumber = addNode ( nod );
-		delete nod;
-
-		nod = new  nodeVirtualEdges<streamOutNodeCountEquals>(fileName);
-		nodeDescriptor streamOutNodeNumber = addNode(nod);
-		streamOutNode *s = dynamic_cast<streamOutNode*>( nodeBlueprint::theNodes[streamOutNodeNumber]);
-
-		eventHandler::insertVisiterAtSignature(bind(&streamOutNode::evolve,s, 0.0),eventNumber);
-		delete nod;
-
-
-
-
-		network::addEdge( streamOutNodeNumber, timeNodeNumber);
-
-
-	}
-
-
-
-
-
-	void createNetwork::observeEventTimes( string fileName,nodeDescriptor eventNumber) {
-		nodeBlueprint* nod = new nodeVirtualEdges<timeNode<baseType> >();
-		nodeDescriptor timeNodeNumber = addNode ( nod );
-		delete nod;
-
-		nod = new  nodeVirtualEdges<streamOutNode>(fileName);
-		nodeDescriptor streamOutNodeNumber = addNode(nod);
-		streamOutNode *s = dynamic_cast<streamOutNode*>( nodeBlueprint::theNodes[streamOutNodeNumber]);
-
-		eventHandler::insertVisiter(bind(&streamOutNode::evolve,s, 0.0),eventNumber);
-		delete nod;
-
-
-
-
-		network::addEdge( streamOutNodeNumber, timeNodeNumber);
-
-
-
-
-
-	}
 
 	nodeDescriptor createNetwork::lattice ( int sizex,  int sizey, double c, nodeBlueprint *n, edgeBlueprint *l )
 	{
@@ -130,15 +63,13 @@ namespace conedy {
 						if ( ( a - i ) * ( a - i ) + ( b-j ) * ( b-j ) <= c && ( a - i ) * ( a - i ) + ( b-j ) * ( b-j ) > 0 )
 						{
 
-							network::addEdge (firstNodeNumber+ i + sizey * j ,firstNodeNumber+ a + sizey * b, l );
+							network::link (firstNodeNumber+ i + sizey * j ,firstNodeNumber+ a + sizey * b, l );
 
 						}
 					}
 
 				}
 
-
-		//	cout << "HIERRAUS" << endl;
 
 		return firstNodeNumber;
 	}
@@ -157,9 +88,6 @@ namespace conedy {
 		vector< pair<int, int > >::iterator it;
 		//		bool cmp (pair< int, int > a, pair< int, int > b);
 
-
-
-
 		for ( unsigned int i = 1; i < 50; i++ )
 			for ( unsigned int j = 0; j <= i; j++ )
 				distVector.push_back ( make_pair<int,int> ( i,j ) );
@@ -167,11 +95,7 @@ namespace conedy {
 		sort ( distVector.begin(), distVector.end(), &cmp2d );
 		//		distVector.sort(&cmp);
 
-
-
-
 		int i,j;
-
 
 		it = distVector.begin();
 		for ( ; it != distVector.end(); it++ )
@@ -185,7 +109,6 @@ namespace conedy {
 					toSelectRandomlyFrom.push_back ( make_pair<int,int> ( it->first, -it->second ) );
 					toSelectRandomlyFrom.push_back ( make_pair<int,int> ( -it->first, -it->second ) );
 					break;
-
 
 				}
 				else
@@ -207,8 +130,6 @@ namespace conedy {
 					toSelectRandomlyFrom.push_back ( make_pair<int,int> ( 0, -it->first ) );
 
 					break;
-
-
 
 				}
 				else
@@ -274,7 +195,7 @@ namespace conedy {
 					targetY = targetY % sizey;
 
 
-					network::addEdge (smallest +  i + sizex * j , smallest + targetX + sizex*targetY, l );
+					network::link (smallest +  i + sizex * j , smallest + targetX + sizex*targetY, l );
 				}
 				int targetVector;
 
@@ -291,7 +212,7 @@ namespace conedy {
 						targetY = targetY % sizey;
 					} while ( network::isLinked(smallest + i+sizex*j,smallest + targetX + sizex*targetY));
 
-					network::addEdge ( smallest + i + sizex * j , smallest + targetX + sizex*targetY, l );
+					network::link ( smallest + i + sizex * j , smallest + targetX + sizex*targetY, l );
 
 				}
 
@@ -341,7 +262,7 @@ namespace conedy {
 						if ( distx * distx + disty * disty  <= c && distx*distx + disty*disty > 0 )
 						{
 
-							network::addEdge (firstNodeNumber + i + sizey * j ,firstNodeNumber + a + sizey * b, l );
+							network::link (firstNodeNumber + i + sizey * j ,firstNodeNumber + a + sizey * b, l );
 
 						}
 					}
@@ -364,7 +285,7 @@ namespace conedy {
 
 
 
-nodeDescriptor createNetwork::beeWeb ( int x, int y, nodeBlueprint *n )
+nodeDescriptor createNetwork::beeWeb ( int x, int y, nodeBlueprint *n, edgeBlueprint *l )
 {
 	int i, a_x,a_y,b_x,b_y;
 	int dist_x, dist_y;
@@ -390,7 +311,7 @@ nodeDescriptor createNetwork::beeWeb ( int x, int y, nodeBlueprint *n )
 
 					if ( sqrt ( (baseType) dist_x*dist_x+dist_y*dist_y+dist_x*dist_y ) <=1 )
 
-						network::addEdge ( a_x * x + a_y, b_x*x + b_y );
+						network::link ( a_x * x + a_y, b_x*x + b_y, l );
 
 
 				}
@@ -405,11 +326,7 @@ void createNetwork::addRandomEdgesUndirected ( double meanOutDeg, edgeBlueprint 
 {
 
 	int source, target;
-
-
-
-
-	baseType meanOut = ( ( statisticsNetwork* ) this )->meanOutDegree() ;
+	baseType meanOut = ( ( statisticsNetwork* ) this )->meanDegree() ;
 
 	int toDo = ( int ) ( ( meanOutDeg - meanOut ) * network::numberVertices() / 2 );
 
@@ -425,8 +342,8 @@ void createNetwork::addRandomEdgesUndirected ( double meanOutDeg, edgeBlueprint 
 				target = network::randomNode();
 			}
 			while ( source == target || network::isLinked ( source,target ) );
-			network::addEdge ( source,target,l );
-			network::addEdge ( target,source,l );
+			network::link ( source,target,l );
+			network::link ( target,source,l );
 		}
 	}
 
@@ -469,7 +386,7 @@ void createNetwork::removeRandomEdgesUndirected ( double prop, edgeBlueprint * l
 
 
 
-void createNetwork::removeRandomEdges ( double prop, edgeBlueprint * l)
+void createNetwork::removeRandomEdgesDirected ( double prop, edgeBlueprint * l)
 {
 
 
@@ -501,7 +418,7 @@ void createNetwork::removeRandomEdges ( double prop, edgeBlueprint * l)
 
 
 
-void createNetwork::addRandomEdges ( double meanOutDeg, edgeBlueprint *l )
+void createNetwork::addRandomEdgesDirected ( double meanOutDeg, edgeBlueprint *l )
 {
 
 	int source, target;
@@ -509,7 +426,7 @@ void createNetwork::addRandomEdges ( double meanOutDeg, edgeBlueprint *l )
 
 
 
-	baseType meanOut = ( ( statisticsNetwork* ) this )->meanOutDegree() ;
+	baseType meanOut = ( ( statisticsNetwork* ) this )->meanDegree() ;
 
 	int toDo = ( int ) ( ( meanOutDeg - meanOut ) * network::numberVertices() );
 
@@ -525,7 +442,7 @@ void createNetwork::addRandomEdges ( double meanOutDeg, edgeBlueprint *l )
 				target = network::randomNode();
 			}
 			while ( source == target || network::isLinked ( source,target ) );
-			network::addEdge ( source,target,l );
+			network::link ( source,target,l );
 		}
 	}
 
@@ -535,61 +452,61 @@ void createNetwork::addRandomEdges ( double meanOutDeg, edgeBlueprint *l )
 
 
 
-	template < typename RANDOM>
-void createNetwork::randomOutDegreeDistribution ( int number, RANDOM &r, nodeBlueprint *n )
-{
-	int i, j;
-	int deg;
-	int rnd;
-	network::clear();
-	for ( i = 0; i < number; i++ )
-		addNode ( n );
-	uniformInt randomNode ( 0,number-1 );
-	for ( i = 0; i < number; i++ )
-	{
-		deg = ( int ) r();
-		if ( deg > number - 1 )
-			deg = number - 1;
-
-
-		for ( j = 0; j < deg; j++ )
-		{
-			do { rnd = randomNode(); }
-			while ( ( rnd == i ) || network::isLinked ( i,rnd ) );
-			network::addEdge ( i,rnd );
-		}
-	}
-}
-
-
-
-	template < typename RANDOM>
-void createNetwork::randomInDegreeDistribution ( int number, RANDOM &r, nodeBlueprint *n )
-{
-	int i, j;
-	int deg;
-	int rnd;
-	network::clear();
-	for ( i = 0; i < number; i++ )
-		addNode ( n );
-	uniformInt randomNode ( 0,number-1 );
-	for ( i = 0; i < number; i++ )
-	{
-		deg = ( int ) r();
-		if ( deg > number - 1 )
-			deg = number - 1;
-
-
-		for ( j = 0; j < deg; j++ )
-		{
-			do { rnd = randomNode(); }
-			while ( ( rnd == i ) || network::isLinked ( i,rnd ) );
-			network::addEdge ( rnd,i );
-		}
-	}
-}
-
-
+//	template < typename RANDOM>
+//void createNetwork::randomOutDegreeDistribution ( int number, RANDOM &r, nodeBlueprint *n )
+//{
+//	int i, j;
+//	int deg;
+//	int rnd;
+//	network::clear();
+//	for ( i = 0; i < number; i++ )
+//		addNode ( n );
+//	uniformInt randomNode ( 0,number-1 );
+//	for ( i = 0; i < number; i++ )
+//	{
+//		deg = ( int ) r();
+//		if ( deg > number - 1 )
+//			deg = number - 1;
+//
+//
+//		for ( j = 0; j < deg; j++ )
+//		{
+//			do { rnd = randomNode(); }
+//			while ( ( rnd == i ) || network::isLinked ( i,rnd ) );
+//			network::link ( i,rnd );
+//		}
+//	}
+//}
+//
+//
+//
+//	template < typename RANDOM>
+//void createNetwork::randomInDegreeDistribution ( int number, RANDOM &r, nodeBlueprint *n )
+//{
+//	int i, j;
+//	int deg;
+//	int rnd;
+//	network::clear();
+//	for ( i = 0; i < number; i++ )
+//		addNode ( n );
+//	uniformInt randomNode ( 0,number-1 );
+//	for ( i = 0; i < number; i++ )
+//	{
+//		deg = ( int ) r();
+//		if ( deg > number - 1 )
+//			deg = number - 1;
+//
+//
+//		for ( j = 0; j < deg; j++ )
+//		{
+//			do { rnd = randomNode(); }
+//			while ( ( rnd == i ) || network::isLinked ( i,rnd ) );
+//			network::link ( rnd,i );
+//		}
+//	}
+//}
+//
+//
 
 
 
@@ -630,14 +547,14 @@ void createNetwork::addRandomEdgesDegreeDistributionUndirected ( function <doubl
 	}
 	for (unsigned int i = 0 ; i < nodeStubs.size() / 2; i++ )
 	{
-		addEdge ( nodeStubs[2 * i], nodeStubs [ 2 * i + 1], l);
-		addEdge ( nodeStubs[2 * i + 1], nodeStubs [ 2 * i], l);
+		link ( nodeStubs[2 * i], nodeStubs [ 2 * i + 1], l);
+		link ( nodeStubs[2 * i + 1], nodeStubs [ 2 * i], l);
 	}
 
 }
 
 
-void createNetwork::addRandomEdgesDegreeDistribution ( function <double () > r , edgeBlueprint *l)
+void createNetwork::addRandomEdgesDegreeDistributionDirected ( function <double () > r , edgeBlueprint *l)
 {
 	nodeList vl;
 	verticesMatching (vl,_dynNode_);
@@ -666,44 +583,12 @@ void createNetwork::addRandomEdgesDegreeDistribution ( function <double () > r ,
 		nodeStubs [i] = swap;
 	}
 	for (unsigned int i = 0 ; i < nodeStubs.size() / 2; i++ )
-		addEdge ( nodeStubs[2 * i], nodeStubs [ 2 * i + 1], l);
+		link ( nodeStubs[2 * i], nodeStubs [ 2 * i + 1], l);
 
 }
 
 
 
-void createNetwork::addEnterNode ( string s )
-{
-
-	//		nodeBlueprint *n = new enterNode<baseType> ( s );
-	//		addNode ( n );
-	//		delete n;
-}
-
-
-
-void createNetwork::observeEvent (string s, nodeDescriptor signature)
-{
-	nodeBlueprint* nod = new nodeVirtualEdges <eventCountNode >(signature);
-	nodeDescriptor newNodeNumber = addNode ( nod );
-
-	delete nod;
-	nod = new nodeVirtualEdges <streamOutNode > ( s );
-	nodeDescriptor outNodeNumber = addNode ( nod );
-	addEdge ( outNodeNumber, newNodeNumber);
-	inOutNodeList.push_back ( dynamic_cast<dynNode*> ( node::theNodes[outNodeNumber] ));
-	delete nod;
-}
-
-void createNetwork::observeTime ( string s )
-{
-	nodeBlueprint* nod = new nodeVirtualEdges<timeNode<baseType> >();
-	nodeDescriptor timeNodeNumber = addNode ( nod );
-	delete nod;
-
-	observeWithoutCheck (timeNodeNumber, s, stdEdge);
-
-}
 
 
 
@@ -716,25 +601,6 @@ nodeDescriptor createNetwork::streamInLattice ( int sizex, int sizey,string s )
 	return ret;
 }
 
-
-
-void createNetwork::observeComponents (nodeDescriptor n, string fileName)
-{
-	unsigned int dimension =   ((dynNode*) node::theNodes[n])-> dimension();
-
-
-		component<edgeVirtual> * l;
-
-	for (unsigned int i = 0; i < dimension; i++) {
-		l = new component <edgeVirtual> (i);
-		observe (n, fileName, l);
-		delete l;
-	}
-
-
-
-
-}
 
 
 
@@ -771,7 +637,7 @@ nodeDescriptor createNetwork::createFromAdjacencyList(string fileName, nodeBluep
 		if (weight != 1.0)
 			((edgeVirtual*)l)->setWeight(weight);
 
-		network::addEdge(source +smallest, target +smallest, l);
+		network::link(source +smallest, target +smallest, l);
 
 
 
@@ -807,8 +673,8 @@ nodeDescriptor createNetwork::completeNetwork ( int number, nodeBlueprint *n, ed
 		//<baseType>::addNode < nodeBlueprint< baseType > > ();
 		for ( j = 0; j < i; j++ )
 		{
-			network::addEdge (firstNodeNumber +  i, firstNodeNumber + j,l );
-			network::addEdge (firstNodeNumber +  j, firstNodeNumber + i,l );
+			network::link (firstNodeNumber +  i, firstNodeNumber + j,l );
+			network::link (firstNodeNumber +  j, firstNodeNumber + i,l );
 		}
 	}
 	return firstNodeNumber;
@@ -867,8 +733,8 @@ nodeDescriptor createNetwork::cycle ( int number, int a,nodeBlueprint *n, edgeBl
 		for ( i = 1; i <= a ; i++ )
 		{
 			//           cout << "VON:"<< j<< "NACH:" << ((number + j - i) % number)<< endl;
-			network::addEdge ( smallest + j, smallest + ( ( number + j - i ) % number) ,l );
-			network::addEdge ( smallest + j, smallest + ( ( number + j + i ) % number) ,l );
+			network::link ( smallest + j, smallest + ( ( number + j - i ) % number) ,l );
+			network::link ( smallest + j, smallest + ( ( number + j + i ) % number) ,l );
 		}
 	return smallest;
 }
@@ -898,9 +764,9 @@ nodeDescriptor createNetwork::line ( unsigned int number, unsigned int a,nodeBlu
 		{
 			//           cout << "VON:"<< j<< "NACH:" << ((number + j - i) % number)<< endl;
 			if  (j + i <=  largest)
-				network::addEdge ( j,  j + i  ,l );
+				network::link ( j,  j + i  ,l );
 			if (j >= smallest + i)
-				network::addEdge ( j,   j  - i    ,l );
+				network::link ( j,   j  - i    ,l );
 		}
 	return smallest;
 }
@@ -930,49 +796,19 @@ nodeDescriptor createNetwork::cycleCluster (int number1, nodeBlueprint *n1, int 
 	{
 		for ( i = 1; i <= a ; i++ )
 		{
-			network::addEdge ( j, ( ( number + ( j ) - i ) % number ) , stdEdge );
-			network::addEdge ( j, ( ( number + ( j ) + i ) % number ) , stdEdge );
+			network::link ( j, ( ( number + ( j ) - i ) % number ) , stdEdge );
+			network::link ( j, ( ( number + ( j ) + i ) % number ) , stdEdge );
 		}
 	}
 	return smallest;
 }
 
 
-void createNetwork::rewireSourcePerTimestep ( double prop,function <baseType ()> r, nodeKind theNodeKind )
-{
-	/*	nodeBlueprint *n = new nodeVirtualEdges <distributeRandomelyNode<baseType> > ( network::numberVertices(),r );
-		nodeDescriptor newNodeNumber = addNode ( n );
-		network::addEdges ( theNodeKind,newNodeNumber );
-
-	//		addSuperAttractiveNode(n,theNodeKind);
-
-
-	network::edgeList toChange;
-	network::edgeIterator it;
-
-	unsigned int i;
-	network::edgesBetween ( toChange,theNodeKind,theNodeKind );
-
-
-
-	for ( it = toChange.begin(); it != toChange.end(); it++ )
-	{
-	if ( network::noise.getUniform() > prop )
-	continue;
-	i = it->first;
-	throw "createNetwork::rewireSourcePerTimeStep need repairing!";
-	//			it->second ->weight = 1;
-	//			network::theNodes[network::numberVertices()-1]->link ( it->second->target, it->second );
-	//			network::theNodes[i]->unlink (it->second->target );
-	}
-*/
-}
 
 
 
 
-
-void createNetwork::rewireTarget ( double prop, nodeKind theNodeKind )
+void createNetwork::rewireTargetDirected ( double prop, nodeKind theNodeKind )
 {
 	network::edgeList toChange;
 	network::edgeIterator it;
@@ -1026,7 +862,7 @@ void createNetwork::rewireWeights ( double prop ,boost::function<double () > r,n
 
 		((edgeVirtual*)  getEdge(*it))->setWeight( r() );
 
-		network::addEdge ( newSource,newTarget, (edgeBlueprint *) node::theNodes[it->first]-> getEdge(it->second));
+		network::link ( newSource,newTarget, (edgeBlueprint *) node::theNodes[it->first]-> getEdge(it->second));
 
 		network::unlink( oldSource, oldTarget);
 	}
@@ -1037,7 +873,7 @@ void createNetwork::rewireWeights ( double prop ,boost::function<double () > r,n
 
 
 
-void createNetwork::rewire ( double prop, nodeBlueprint *n )
+void createNetwork::rewireDirected ( double prop, nodeBlueprint *n )
 {
 
 	network::edgeList toChange;
@@ -1053,15 +889,13 @@ void createNetwork::rewire ( double prop, nodeBlueprint *n )
 
 	for ( it = toChange.begin(); it != toChange.end(); it++ )
 	{
-
-		//		network::printAdjacencyList();
 		if ( network::noise.getUniform() > prop )
 			continue;
 
 		nodeDescriptor newSource, oldSource;
 		nodeDescriptor newTarget, oldTarget;
 
-		oldSource = it->first ;
+		oldSource = getSource ( *it);
 		oldTarget = getTarget ( *it);
 
 
@@ -1076,13 +910,11 @@ void createNetwork::rewire ( double prop, nodeBlueprint *n )
 		if ( ( newSource == oldSource ) && ( newTarget == oldTarget ) )
 			continue;
 
-
-		network::addEdge ( newSource,newTarget, (edgeBlueprint *)getEdge(*it));
-		network::unlink ( oldSource, oldTarget );
-
+		network::link ( newSource,newTarget, (edgeBlueprint *)getEdge(*it));
+		network::remove (*it);
 	}
 
-	network::clean();
+	network::clean();   // removes holes in the edge arrays of nodes which were created by removing of edges.
 
 }
 
@@ -1096,6 +928,8 @@ void createNetwork::rewire ( double prop, nodeBlueprint *n )
 
 void createNetwork::replaceEdges ( double prop, edgeBlueprint * l, nodeBlueprint *n )
 {
+	if (!directed)
+		throw "replaceEdges for undirected networks not implemented at the moment.";
 
 	network::edgeList toChange;
 	network::edgeIterator it;
@@ -1109,7 +943,6 @@ void createNetwork::replaceEdges ( double prop, edgeBlueprint * l, nodeBlueprint
 
 	for ( it = toChange.begin(); it != toChange.end(); it++ )
 	{
-		//		network::printAdjacencyList();
 		if ( network::noise.getUniform() > prop )
 			continue;
 
@@ -1132,7 +965,7 @@ void createNetwork::replaceEdges ( double prop, edgeBlueprint * l, nodeBlueprint
 			continue;
 
 
-		network::addEdge ( newSource,newTarget, l );
+		network::link ( newSource,newTarget, l );
 		nodeBlueprint::theNodes[oldSource]->unlink ( oldTarget );
 
 	}
@@ -1143,16 +976,16 @@ void createNetwork::replaceEdges ( double prop, edgeBlueprint * l, nodeBlueprint
 
 
 
-void createNetwork::rewireUndirected ( double prop, nodeKind theNodeKind ) // rewire für ungerichtete Netzwerke die danach immer noch ungerichtetet sein sollen
+void createNetwork::rewireUndirected ( double prop, nodeBlueprint * n ) // rewire für ungerichtete Netzwerke die danach immer noch ungerichtetet sein sollen
 
 {
 	network::edgeList allLinks, toChange;
 	network::edgeIterator it;
 
-	network::edgesBetween ( allLinks, theNodeKind, theNodeKind );
+	network::edgesBetween ( allLinks, n,n);
 
 	nodeList vl;
-	network::verticesMatching(vl, theNodeKind);
+	network::verticesMatching(vl, n);
 	getRandomNode r (vl);
 
 
@@ -1183,8 +1016,8 @@ void createNetwork::rewireUndirected ( double prop, nodeKind theNodeKind ) // re
 		if ( ( newSource == oldSource ) && ( newTarget == oldTarget ) )
 			continue;
 
-		network::addEdge ( newSource, newTarget, (edgeBlueprint *)getEdge(*it));
-		network::addEdge ( newTarget, newSource, (edgeBlueprint *)getEdge(*it));
+		network::link ( newSource, newTarget, (edgeBlueprint *)getEdge(*it));
+		network::link ( newTarget, newSource, (edgeBlueprint *)getEdge(*it));
 		network::unlink ( oldSource, oldTarget );
 		network::unlink ( oldTarget, oldSource );
 
@@ -1229,7 +1062,7 @@ void createNetwork::rewireTargetUndirected ( double prop, nodeKind theNodeKind )
 
 			nodeBlueprint::theNodes[it->first]->getEdge(it->second)->targetNumber = newTarget ;
 
-			network::addEdge ( newTarget, Source, (edgeBlueprint *)getEdge(*it) );
+			network::link ( newTarget, Source, (edgeBlueprint *)getEdge(*it) );
 			network::unlink ( oldTarget, Source );
 
 		}
@@ -1268,7 +1101,7 @@ void createNetwork::rewireSource ( double prop, nodeKind theNodeKind )
 }
 
 
-nodeDescriptor createNetwork::randomNetwork ( int size, double promille, nodeBlueprint *n, edgeBlueprint *l )
+nodeDescriptor createNetwork::randomNetworkDirected ( int size, double promille, nodeBlueprint *n, edgeBlueprint *l )
 {
 	int i, j;
 
@@ -1284,9 +1117,9 @@ nodeDescriptor createNetwork::randomNetwork ( int size, double promille, nodeBlu
 		for ( j = 0; j < i; j++ )
 		{
 			if ( network::noise.getUniform() <= promille )
-				network::addEdge ( smallest + i,smallest + j,l );
+				network::link ( smallest + i,smallest + j,l );
 			if ( network::noise.getUniform() <= promille )
-				network::addEdge ( smallest + j,smallest + i,l );
+				network::link ( smallest + j,smallest + i,l );
 
 		}
 	}
@@ -1294,7 +1127,7 @@ nodeDescriptor createNetwork::randomNetwork ( int size, double promille, nodeBlu
 }
 
 
-nodeDescriptor createNetwork::randomUndirectedNetwork ( int size, double promille, nodeBlueprint *n, edgeBlueprint *l )
+nodeDescriptor createNetwork::randomNetworkUndirected ( int size, double promille, nodeBlueprint *n, edgeBlueprint *l )
 {
 	int i, j;
 
@@ -1311,8 +1144,8 @@ nodeDescriptor createNetwork::randomUndirectedNetwork ( int size, double promill
 		{
 			if ( network::noise.getUniform() <= promille )
 			{
-				network::addEdge ( smallest + i,smallest + j,l );
-				network::addEdge ( smallest + j,smallest + i,l );
+				network::link ( smallest + i,smallest + j,l );
+				network::link ( smallest + j,smallest + i,l );
 			}
 		}
 	}
@@ -1373,8 +1206,8 @@ nodeDescriptor createNetwork::scaleFreeNetwork ( int size, int c, nodeBlueprint 
 				}
 			}
 			while(isUsed);
-			network::addEdge (smallest+c+i, smallest+j, l);
-			network::addEdge (smallest+j, smallest+c+i, l);
+			network::link (smallest+c+i, smallest+j, l);
+			network::link (smallest+j, smallest+c+i, l);
 			degrees[j]+=1;	
 			used[k]=j;
 		}
@@ -1446,271 +1279,10 @@ nodeDescriptor createNetwork::createFromAdjacencyMatrix (string fileName, nodeBl
 				continue;
 			if (d != 1.0)
 				e->setWeight(d);
-			addEdge ( i,j,e);
+			link ( i,j,e);
 		}
 	return firstNodeNumber;
 }
-
-
-
-//! wie oben mit links vom Typ l
-void createNetwork::observeSum ( string s, edgeBlueprint *l )
-{
-
-
-	nodeBlueprint *nod = new nodeVirtualEdges <streamOutNode> ( s );
-	int newNodeNumber = addNode ( nod );
-
-//	unsigned int nodeNumbers = numberVertices(_dynNode_);
-//	l->setWeight(1.0/nodeNumbers);
-	network::addEdges ( newNodeNumber,_dynNode_,l );
-
-	inOutNodeList.push_back ( dynamic_cast<dynNode*> (nodeBlueprint::theNodes[newNodeNumber] ));
-//	addEnterNode ( s );
-	delete nod;
-}
-
-
-//! wie oben allerdings wird die Phasenkohärenz r der States s_i weggeschrieben: r = 1/N \sum\limits_i exp( 2 * PI * s_i). Phasen gehen von 0 bis 1 !!! TODO: vielleicht von streamOutNode erben ??
-
-//void createNetwork::observePhaseCoherence ( string s )
-//{
-//	nodeBlueprint *nod = new nodeVirtualEdges < calculateMeanPhaseCoherence > ();
-//	nodeDescriptor newNodeNumber = addNode ( nod );
-//	network::addEdges ( newNodeNumber,_dynNode_ );
-//	delete nod;
-//	observe(newNodeNumber,s);
-//}
-
-
-//void createNetwork::observeAll ( string s, edgeBlueprint *l )
-//{
-//	network::nodeList vl;
-//	network::verticesMatching ( vl,_dynNode_ );
-//	network::nodeIterator it;
-//
-//	for ( it = vl.begin(); it != vl.end(); it++ )
-//		observe( *it,s, l);
-//
-//}
-//
-
-
-
-void createNetwork::observeAll ( string s, nodeBlueprint *n, edgeBlueprint *l )
-{
-	network::nodeList vl;
-	network::verticesMatching ( vl, n);
-	network::nodeIterator it;
-	for ( it = vl.begin(); it != vl.end(); it++ )
-		observe( *it,s, l);
-}
-
-
-
-
-
-//void createNetwork::observeAll ( string s, edgeBlueprint *l , nodeBlueprint *n , nodeDescriptor lower , nodeDescriptor upper)
-//{
-//	nodeList vl;
-//
-//	if (n == stdNode)
-//		verticesMatching(vl, _dynNode_);
-//	else
-//		verticesMatching(vl, n);
-//
-//	nodeIterator vi;
-//	for (vi=vl.begin();vi != vl.end();vi++)
-//	{
-//		if ((node::theNodes[*vi]->getNumber() >=lower) && (node::theNodes[*vi]->getNumber() <= upper))
-//		observe( *vi,s, l);
-//	}
-//
-//
-//}
-//
-//
-
-
-
-void createNetwork::observePhaseCoherence ( string s, edgeBlueprint *l, nodeBlueprint *n, nodeDescriptor lower, nodeDescriptor upper)
-{
-
-	nodeBlueprint *nod = new nodeVirtualEdges < calculateMeanPhaseCoherence > ();
-	nodeDescriptor newNodeNumber = addNode ( nod );
-	nodeList vl;
-
-	if (n == stdNode)
-		verticesMatching(vl, _dynNode_);
-	else
-		verticesMatching(vl, n);
-
-	nodeIterator vi;
-	for (vi=vl.begin();vi != vl.end();vi++)
-	{
-		if ((node::theNodes[*vi]->getNumber() >=lower) && (node::theNodes[*vi]->getNumber() <= upper))
-			network::addEdge(newNodeNumber, *vi);
-	}
-
-	delete nod;
-
-
-	if (getGlobal<bool>("outputBinary"))
-		nod = new nodeVirtualEdges <streamOutNodeBinary > ( s );
-	else
-		nod = new nodeVirtualEdges <streamOutNode > ( s );
-	nodeDescriptor outNodeNumber = addNode ( nod );
-	addEdge ( outNodeNumber, newNodeNumber);
-	inOutNodeList.push_back ( dynamic_cast<dynNode*> ( node::theNodes[outNodeNumber] ));
-	delete nod;
-}
-
-void createNetwork::observePhaseDistance ( string s, nodeBlueprint *n)
-{
-	network::edgeList *vl = new edgeList();
-	edgesBetween(*vl, n->getNodeInfo().theNodeType, n->getNodeInfo().theNodeType);
-	nodeBlueprint *nod = new nodeVirtualEdges <phaseDistance <baseType> >();
-	 ( (nodeVirtualEdges< phaseDistance <baseType > > *) nod)->setList (vl);
-
-	long newNodeNumber = addNode (nod);
-	observe(newNodeNumber,s);
-
-}
-
-void createNetwork::observeHist ( string fileName,    nodeBlueprint *n)
-{
-	nodeBlueprint *nod = new  nodeVirtualEdges<streamOutNodeHist>(fileName);
-		nodeDescriptor streamOutNodeNumber = addNode(nod);
-		network::addEdges ( streamOutNodeNumber, n->getNodeInfo().theNodeType);
-
-	inOutNodeList.push_back ( dynamic_cast<dynNode*> ( nodeBlueprint::theNodes[streamOutNodeNumber] ));
-
-
-
-	}
-
-
-
-
-
-void createNetwork::observePhaseCorrelation ( string s, nodeBlueprint *n)
-{
-	network::edgeList *vl = new edgeList();
-	edgesBetween(*vl, n->getNodeInfo().theNodeType, n->getNodeInfo().theNodeType);
-	nodeBlueprint *nod = new nodeVirtualEdges <phaseCorrelation <baseType> >();
-	 ( (nodeVirtualEdges< phaseCorrelation <baseType > > *) nod)->setList (vl);
-
-	long newNodeNumber = addNode (nod);
-	observe(newNodeNumber,s);
-
-}
-//void createNetwork::observePhaseCoherence ( string s, nodeBlueprint *n,  edgeBlueprint *l )
-//{
-//	//	if (n->getNodeInfo().theNodeType == _pcoIFNeuron_ && l->getEdgeInfo().theEdgeType == _phaseOfPCPO_)
-//	//		nod = new nodeTemplateEdges  <phaseOfPCPO < edge >,  pcoIFNeuron,   calculateMeanPhaseCoherence  >;
-//	//	else
-//
-//
-//	nodeBlueprint *nod = new nodeVirtualEdges < calculateMeanPhaseCoherence > ();
-//	nodeDescriptor newNodeNumber = addNode ( nod );
-//	network::addEdges ( newNodeNumber,n -> getNodeInfo().theNodeType,l );
-//	delete nod;
-//
-//
-//
-//}
-//
-
-//! wie oben. Phasen werden von Edges vom Typ l übergeben.
-//void createNetwork::observePhaseCoherence ( string s, edge *l )
-//{
-//
-//	nodeBlueprint *nod = new nodeVirtualEdges < calculateMeanPhaseCoherence > ();
-//	nodeDescriptor newNodeNumber = addNode ( nod );
-//	network::addEdges ( newNodeNumber,_dynNode_,l );
-//	delete nod;
-//
-//	observe(newNodeNumber,s);
-//}
-//
-
-void createNetwork::observeMeanPhase ( string s )
-{
-	nodeBlueprint *nod = new nodeVirtualEdges <calculateMeanPhase> ();
-	nodeDescriptor newNodeNumber = addNode ( nod );
-	network::addEdges ( newNodeNumber,_dynNode_ );
-	delete nod;
-	observe(newNodeNumber,s);
-}
-
-//! wie oben. Phasen werden von Edges vom Typ l übergeben.
-void createNetwork::observeMeanPhase ( string s, edgeBlueprint *l )
-{
-	nodeBlueprint *nod = new nodeVirtualEdges <calculateMeanPhase> ();
-	nodeDescriptor newNodeNumber = addNode ( nod );
-	network::addEdges ( newNodeNumber,_dynNode_,l );
-	delete nod;
-
-	observe(newNodeNumber,s);
-}
-
-
-
-//! schreibt die Simulationszeit dynNode::time in die Datei s.
-
-
-void createNetwork::observeEventCounter ( string s, unsigned int signature)
-{
-	nodeBlueprint* nod = new nodeVirtualEdges <eventCountNode>  (signature);
-	nodeDescriptor newNodeNumber = addNode ( nod );
-	observe ( newNodeNumber, s );
-
-}
-
-
-
-//! observiert den Knoten number mit einer stdEdge und schreibt in die Datei s.
-//void createNetwork::observe ( string s, nodeDescriptor number )
-//{
-//	nodeBlueprint *nod = new nodeVirtualEdges <streamOutNode> ( s );
-//	nodeDescriptor newNodeNumber = addNode ( nod );
-//	addEdge ( newNodeNumber, number );
-//	inOutNodeList.push_back ( (dynamic_cast<dynNode*> (nodeBlueprint::theNodes[newNodeNumber] )));
-//
-//	delete nod;
-//}
-//
-
-
-void createNetwork::observe ( nodeDescriptor number, string s, edgeBlueprint * l )
-{
-	if (node::theNodes.size()  <= number  || node::theNodes[number] == NULL)
-		throw "node which should be observed does not exist.";
-	if	((node::theNodes[number]->getNodeInfo().theNodeKind & _dynNode_ )== 0)
-		throw "node to be observed is no dynNode.";
-	observeWithoutCheck (number, s, l);
-}
-
-
-void createNetwork::observeWithoutCheck (nodeDescriptor number, string s, edgeBlueprint *l)
-{
-	nodeBlueprint *nod;
-
-	if (getGlobal<bool>("outputBinary"))
-		nod = new nodeVirtualEdges <streamOutNodeBinary > ( s );
-	else
-		nod = new nodeVirtualEdges <streamOutNode > ( s );
-	nodeDescriptor newNodeNumber = addNode ( nod );
-
-	addEdge ( newNodeNumber, number,l );
-	inOutNodeList.push_back ( dynamic_cast<dynNode*> ( nodeBlueprint::theNodes[newNodeNumber] ));
-	delete nod;
-
-}
-
-
-
-
 
 
 
