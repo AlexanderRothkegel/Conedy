@@ -83,32 +83,35 @@ namespace conedy
 
 			//! removes all nodes from the network
 			virtual void clear();
+
+			//! return true, if for every edge between dynNodes in the network, there exist an edge with source and target interchanged.
+			bool isDirected();
+
+			//! returns true if there is a link between node i and j
+			bool isLinked ( nodeDescriptor i, nodeDescriptor j );
+
+			//! returns the connections strength between node i and j, returns 0 if no connection exists.
+			baseType linkStrength ( nodeDescriptor i, nodeDescriptor j );
 			
 			//! Randomizes the coupling strengths for all edges which connect nodes of kind sourcenNodeKind to nodes of kind targetNodeKind. New weights are drawn from r.
 			void randomizeWeights( function<baseType()> r, nodeBlueprint *n1 = stdNode, nodeBlueprint *n2 = stdNode);
 
 			//! replaces node nodeNumber with a newly created node constructed by n->construct() 
-			void replaceNodes(nodeDescriptor nodeNumber, nodeBlueprint *n = stdNode);
-
-			//! remove all nodes from the network which match n	
-			void removeNodes (nodeBlueprint *n = stdNode);
+			void replaceNode(nodeDescriptor nodeNumber, nodeBlueprint *n = stdNode);
 
 			//! removes all edges between source and target (should be only one)
 			void removeEdge (nodeDescriptor source, nodeDescriptor target) { node::theNodes[source]->unlink(target); }
-			//! returns true if there is a link between node i and j
-			bool isLinked ( nodeDescriptor i, nodeDescriptor j );
-			
-			//! return true, if for every edge between dynNodes in the network, there exist an edge with source and target interchanged.
-			bool isDirected();
 	
 			//! remove edge e fromthe network.
 			void removeEdges (edgeBlueprint * e);
 
-			//! restrict the network to the node number numbers which are in the file fileName
-			void select (string fileName) ;
+			//! remove all nodes from the network which match n	
+			void removeNodes (nodeBlueprint *n = stdNode);
 
-			//! returns the number of nodes in the network
-			unsigned int size() { return theNodes.size(); }
+			void setDirected () { directed = true; };
+				
+			void setUndirected () { directed = false; };
+
 
 			static void registerStandardValues() {
 			  //! determines the verbosity when print node information after a call of printNodeStatistics();
@@ -131,13 +134,12 @@ namespace conedy
 
 			virtual ~network();
 
+			//! restrict the network to the node number numbers which are in the file fileName
+			void select (string fileName) ;
 
-			void setDirected () { directed = true; };
-				
-			void setUndirected () { directed = false; };
+			//! returns the number of nodes in the network of kind theNodeKind
+			nodeDescriptor numberVertices ( nodeBlueprint *n = stdNode );
 
-			//! returns the connections strength between node i and j, returns 0 if no connection exists.
-			baseType linkStrength ( nodeDescriptor i, nodeDescriptor j ) { return node::theNodes[i]->linkStrength ( j ); }
 
 
 		friend bool compareByTargets (network::edgeDescriptor l, network::edgeDescriptor r) {return network::getTarget(l) < network::getTarget(r); } 
@@ -152,8 +154,6 @@ namespace conedy
 
 
 
-			//! returns the number of nodes in the network
-			unsigned int numberVertices() { return theNodes.size(); }
 
 
 			void remove (edgeDescriptor e) { node::theNodes[e.first]-> removeEdge (e.second);}
@@ -243,8 +243,6 @@ namespace conedy
 			void link (nodeDescriptor sourceNode, nodeKind targetNodeKind, edge *l);
 
 
-			//! returns the number of nodes in the network of kind theNodeKind
-			unsigned int numberVertices ( nodeKind theNodeKind );
 
 
 			unsigned int randomNode(nodeKind nodeKind = _dynNode_);

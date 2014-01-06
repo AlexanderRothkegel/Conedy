@@ -89,13 +89,20 @@ namespace conedy
 
 	};
 
-	void statisticsNetwork::printNodeStatistics()
+	void statisticsNetwork::printNodeStatistics(nodeBlueprint * n)
 	{
 		nodeIterator it;
 		nodeList vl;
+
+		if ( n == network::stdNode)
+		{
 		verticesMatching(vl,_dynNode_);
 		verticesMatching(vl,_outNode_);
 		verticesMatching(vl,_inNode_);
+		}
+		else
+			verticesMatching(vl, n);
+
 
 		for (it = vl.begin(); it != vl.end(); it++)
 		{
@@ -175,18 +182,18 @@ namespace conedy
 	baseType statisticsNetwork::meanWeight()
 	{
 		baseType f = 0.0;
-		int degreeSum = 0;
 
-		network::nodeIterator ia;
-		network::nodeList vl;
-		network::verticesMatching ( vl, _dynNode_ );
-		clean();
-		for ( ia = vl.begin(); ia != vl.end(); ia++ )
+		edgeList el;
+		edgeIterator ei;
+		edgesBetween (el, _dynNode_, _dynNode_);
+
+		unsigned int counter = 0;
+		for (ei = el.begin(); ei != el.end(); ei++) 
 		{
-			f = f + node::theNodes[*ia]->weightSum();
-			degreeSum = degreeSum + node::theNodes[*ia]->degree();
+			counter++;	
+			f = f +  getWeight (*ei);		
 		}
-		f = f / degreeSum;
+		f = f / counter;
 		return f;
 	}
 
@@ -258,8 +265,9 @@ namespace conedy
 	baseType statisticsNetwork::meanClustering()
 	{
 
-		baseType f, linkedFriends= 0;
-
+		baseType linkedFriends= 0;
+		baseType f = 0;
+			
 		network::nodeIterator ia;
 		network::nodeList vl;
 		network::verticesMatching ( vl,_dynNode_ );
@@ -273,9 +281,11 @@ namespace conedy
 					linkedFriends+= linkStrength (getTarget (*s), getTarget (*t)); 
 
 			if ( el.size() > 1 )
-				return ( baseType ) linkedFriends / ( el.size() * ( el.size() -1 ) );
+				linkedFriends =  linkedFriends / ( el.size() * ( el.size() -1 ) );
+		
 
 			f = f + linkedFriends; 
+			linkedFriends = 0;
 		}
 		f = f / network::numberVertices();
 		return f;
