@@ -20,7 +20,7 @@ makebuilddir/conedy::
 #	cp debian/config.h config.h
 
 makebuilddir/python-conedy::
-	make addNodesIfNecessary docstrings.h
+	make addNodesIfNecessary docstrings.h docstringsNodes.h
 
 include /usr/share/cdbs/1/class/python-distutils.mk
 

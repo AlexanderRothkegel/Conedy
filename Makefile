@@ -265,7 +265,7 @@ conedy-src.uninstall:
 #	cp -r testing ${dirSrc}/
 
 python-conedy.recompile:
-	${noUserSpace} HOME=${HOME} make docstrings.h addNodesIfNecessary string_config.h
+	${noUserSpace} HOME=${HOME} make docstrings.h docstringsNodes.h addNodesIfNecessary string_config.h
 ifdef pythonBjam
 	([ -d build ] && ${noUserSpace} HOME=${HOME} bjam  python-conedy  cflags=-D$(SVNDEV) $(addprefix cflags=-D,${defines}) cflags=-D"ARCHITECTURE=${ARCH}"  -j${numberCores} &&\
 			${noUserSpace} cp -f bin/gcc*/release/python-conedy.so build/lib*/conedy.so ) \
