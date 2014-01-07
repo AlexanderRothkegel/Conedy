@@ -1,4 +1,3 @@
 usr/share/*
 etc/conedy.config
 usr/bin/recompileConedy
-usr/bin/recompilePython-Conedy
