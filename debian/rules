@@ -27,8 +27,7 @@ include /usr/share/cdbs/1/class/python-distutils.mk
 
 install/python-conedy::
 	mkdir -p  tmp/usr/bin/
-#	sed "s#DIRSRC#tmp/usr/share/conedy#g" recompilePython-NeurosimIfNecessary.sh | sed "s#ADDEDDIR#~/.config/conedy#g" > tmp/usr/bin/recompilePython-NeurosimIfNecessary.sh
-	cp -a recompilePython-Conedy debian/tmp/usr/bin/recompilePython-Conedy
+	cp -a recompileConedy debian/tmp/usr/bin/recompileConedy
 	
 	
 
