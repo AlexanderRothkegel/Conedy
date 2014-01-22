@@ -67,15 +67,17 @@ int main ( int argc,char **argv )
 		exit (1);
 	}	
 #endif
+#endif
 
-#elif RECOMPILE
+#ifndef CONDOR
+#if RECOMPILE
 	if (!system ("recompileConedy conedy.recompile 2> /dev/null "))
 	{
 		cout << "Mission accomplished. You can restart your script now." << endl;
 		exit (1);
 	}	
 #endif
-
+#endif
 
 	gslNoise::initialise(); // initialize random numbers
 	printDefines();         // print some CFLAGS present during compilation to standard out

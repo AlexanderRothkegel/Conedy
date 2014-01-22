@@ -20,7 +20,6 @@ include ${HOME}/.config/conedy/config.h      # the config-file is included such 
 #conedy_recompile:
 
 
-#todo config-file is not linked ?XXX
 
 doit: ${todo}
 
