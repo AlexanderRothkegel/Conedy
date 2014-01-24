@@ -21,11 +21,9 @@ class odeIntegrator
 
 	public:
 		odeIntegrator (unsigned int size) {
-			dxdt = (baseType *) calloc (size, sizeof(baseType));		
+			dxdt = (baseType *) calloc (size, sizeof(baseType));
 			for (unsigned int i = 0; i < size; i++)
-			{
 				dxdt[i] = 0;
-			}
 		}
 		virtual ~ odeIntegrator () {
 			free (dxdt);
@@ -44,8 +42,8 @@ class sdeIntegrator
 
 	public:
 		sdeIntegrator ( unsigned int size) {
-			dxdt = (baseType *) calloc (size, sizeof(baseType));	
-			s = (baseType *) calloc (size, sizeof(baseType));	
+			dxdt = (baseType *) calloc (size, sizeof(baseType));
+			s = (baseType *) calloc (size, sizeof(baseType));
 			dsdx = (baseType *) calloc (size, sizeof(baseType));
 
 			for (unsigned int i = 0; i < size; i++)
@@ -68,17 +66,65 @@ class sdeIntegrator
 
 
 class euler : public odeIntegrator
-
 {
-
 	public:
-	euler (unsigned int size) : odeIntegrator( size) {	}
+	euler (unsigned int size) : odeIntegrator(size) {}
 
 	template <typename dgl>
-		void step (double dt, baseType *state, dgl &func, unsigned int size)		{
+		void step (double dt, baseType *state, dgl &func, unsigned int size)
+		{
 			func.dgl(state,dxdt);
 			for (unsigned int i = 0; i < size; i++)
-				state[i] = state[i] + dt * dxdt[i];
+				state[i] += dt * dxdt[i];
+		}
+};
+
+class rk4 : public odeIntegrator
+{
+	protected:
+		baseType * dxdt2; baseType * dxdt3; baseType * dxdt4;
+		baseType * state2; baseType * state3; baseType * state4; 
+
+	public:
+	rk4 (unsigned int size) : odeIntegrator(size)
+		{
+			dxdt2 = (baseType *) calloc (size, sizeof(baseType));
+			dxdt3 = (baseType *) calloc (size, sizeof(baseType));
+			dxdt4 = (baseType *) calloc (size, sizeof(baseType));
+			state2 = (baseType *) calloc (size, sizeof(baseType));
+			state3 = (baseType *) calloc (size, sizeof(baseType));
+			state4 = (baseType *) calloc (size, sizeof(baseType));
+		}
+		virtual ~ rk4 () {
+			free (dxdt2); free (dxdt3); free (dxdt4);
+			free (state2); free (state3); free (state4);
+		}
+
+	template <typename dgl>
+		void step (const double dt, baseType * const state, dgl &func, unsigned int size)
+		{
+			func.dgl(state,dxdt);
+			
+			for (unsigned int i = 0; i < size; i++)
+				state2[i] = state[i] + dt * dxdt[i] / 2.0;
+			func.dgl(state2,dxdt2);
+			
+			for (unsigned int i = 0; i < size; i++)
+				state3[i] = 0.0;
+			
+			for (unsigned int i = 0; i < size; i++)
+				state3[i] = state[i] + dt * dxdt2[i] / 2.0;
+			func.dgl(state3,dxdt3);
+			
+			for (unsigned int i = 0; i < size; i++)
+				state4[i] = 0.0;
+
+			for (unsigned int i = 0; i < size; i++)
+				state4[i] = state[i] + dt * dxdt3[i];
+			func.dgl(state4,dxdt4);
+
+			for (unsigned int i = 0; i < size; i++)
+				state[i] += dt * ( dxdt[i] + 2.0*dxdt2[i] + 2.0*dxdt3[i] + dxdt4[i] ) / 6.0;
 		}
 };
 
@@ -193,22 +239,22 @@ class strongTaylor : public sdeIntegrator
 			a10 = a10*sqrt(2.0*dt)/M_PI - 2*sqrt(dt*rho)*gslNoise::getGaussian();
 			dZ = 0.5*dt*(dW + a10);
 
-			func.dgl(state, dxdt, dydW);														
+			func.dgl(state, dxdt, dydW);
 
 
 			for (unsigned int i = 0; i < size; i++)
-				tmp2[i] = state[i] + dxdt[i]*dt + dydW[i]*sqdt;																                        
+				tmp2[i] = state[i] + dxdt[i]*dt + dydW[i]*sqdt;                        
 
 			//second step
 
-			func.dgl			(tmp2, dyt, dydW);																
-			for (unsigned int i = 0; i < size; i++)					                                    
-				tmp2[i] = state[i] + dxdt[i]*dt - dydW[i]*sqdt;																                        
+			func.dgl			(tmp2, dyt, dydW);
+			for (unsigned int i = 0; i < size; i++)	                                    
+				tmp2[i] = state[i] + dxdt[i]*dt - dydW[i]*sqdt;                        
 
 			//third step
 
 			func.dgl(tmp2, dym, dydW);
-			for (unsigned int i = 0; i < size; i++)					                                    
+			for (unsigned int i = 0; i < size; i++)                                    
 				state[i] += dydW[i]*dW + (dyt[i] - dym[i])/((baseType)2.0*sqdt)*dZ + (dyt[i] + dym[i] + (baseType)2.0*dxdt[i])/(baseType)4.0*dt;	
 
 

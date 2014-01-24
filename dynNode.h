@@ -100,10 +100,9 @@ namespace conedy
 
 	};
 
-	typedef dynNode nodeBlueprint;
 
-	bool match (nodeBlueprint *l, nodeDescriptor r);
-	bool match (nodeDescriptor l, nodeBlueprint *r); 
+	bool match (dynNode *l, nodeDescriptor r);
+	bool match (nodeDescriptor l, dynNode *r); 
 
 
 

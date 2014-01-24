@@ -34,7 +34,8 @@ namespace conedy {
 
 		static void registerStandardValues()
 		{
-			registerGlobal<string>("odeStepType","euler");
+			registerGlobal<string>("odeStepType", "euler");
+			registerGlobal<baseType>("odeStepSize", 0.00001);
 		}
 
 		virtual void swap()
@@ -56,110 +57,31 @@ namespace conedy {
 					integ = new euler (containerDimension() );
 				}
 				else if (stepType == "rk4")
+				{
 					stepType_int = 1;
+					integ = new rk4 (containerDimension() );
+				}
 				else
 				throw "unknown steptype for odeStepType!";
 			}
-	}
+		}
 
 
 
-// RUNGE KUTTA No. 4
-		virtual void evolve(baseType time)
+		virtual void evolve(baseType timeTilEvent)
 		{
-			switch (stepType_int)
+			unsigned int stepCount = timeTilEvent/getGlobal<baseType>("odeStepSize") + 1.0 - 1e-8;
+			double dt = timeTilEvent / stepCount;
+
+			for (unsigned int i = 0; i < stepCount; i++)
 			{
-				case 0:
-					((euler *) integ)->step (time, dynamicVariablesOfAllDynNodes, *this, containerDimension());
-					break;
-				case 1:
-					rungeKutta4Step(time);
-					break;
-
+				if (stepType_int)
+					((rk4 *) integ)->step (dt, dynamicVariablesOfAllDynNodes, *this, containerDimension());
+				else
+					((euler *) integ)->step (dt, dynamicVariablesOfAllDynNodes, *this, containerDimension());
 			}
-
 		}
-
-		void rungeKutta4Step (baseType time)
-		{
-
-
-			list<containerNode<baseType,1>*>::iterator it;
-
-			for (it = containerNode<baseType,1>::nodeList.begin(); it != containerNode<baseType,1>::nodeList.end(); it++)
-				((stdOdeIntegrator *)(*it))->action1(time);
-			for (it = containerNode<baseType,1>::nodeList.begin(); it != containerNode<baseType,1>::nodeList.end(); it++)
-				((stdOdeIntegrator *)(*it))->swap();
-
-			for (it = containerNode<baseType,1>::nodeList.begin(); it != containerNode<baseType,1>::nodeList.end(); it++)
-				((stdOdeIntegrator *)(*it))->action2(time);
-			for (it = containerNode<baseType,1>::nodeList.begin(); it != containerNode<baseType,1>::nodeList.end(); it++)
-				((stdOdeIntegrator *)(*it))->swap();
-
-			for (it = containerNode<baseType,1>::nodeList.begin(); it != containerNode<baseType,1>::nodeList.end(); it++)
-				((stdOdeIntegrator *)(*it))->action3(time);
-			for (it = containerNode<baseType,1>::nodeList.begin(); it != containerNode<baseType,1>::nodeList.end(); it++)
-				((stdOdeIntegrator *)(*it))->swap();
-
-			for (it = containerNode<baseType,1>::nodeList.begin(); it != containerNode<baseType,1>::nodeList.end(); it++)
-				((stdOdeIntegrator *)(*it))->action4(time);
-			for (it = containerNode<baseType,1>::nodeList.begin(); it != containerNode<baseType,1>::nodeList.end(); it++)
-				((stdOdeIntegrator *)(*it))->swap();
-
-		}
-
-
-		void eulerStep (baseType dt)
-		{
-			list<containerNode<baseType,1>*>::iterator it;
-			for (it = containerNode<baseType,1>::nodeList.begin(); it != containerNode<baseType,1>::nodeList.end(); it++)
-			{
-				odeNode * n = (odeNode*) *it;
-				(*n)(n->x, &dydt[0]);
-				for (unsigned int i = 0;i < n->dimension(); i++)
-				 n->odeNodeTmp[i] = n->x[i]  + dydt[i] * dt ;
-			}
-			for (it = containerNode<baseType,1>::nodeList.begin(); it != containerNode<baseType,1>::nodeList.end(); it++)
-				((stdOdeIntegrator *)(*it))->swap();
-
-		}
-
-
-		//! erster schritt im Runge-Kutter 4.Ordnung
-		virtual void action1(baseType dt) {
-			(*this)(this->x, &dydt[0]);
-
-			for (unsigned int i = 0;i < this->dimension(); i++)
-				tmp2[i] = this->x[i];
-//								tmp2 = this->x);
-			for (unsigned int i = 0; i < this->dimension(); i++)
-				this->odeNodeTmp[i] = this->x[i] +  dt/2.0 * dydt[i];
-
-		}
-		//! zweiter schritt
-		virtual void action2(baseType dt) {
-			(*this)(this->x, &dyt[0]);
-			for (unsigned int i = 0; i < this->dimension(); i++)
-				this->odeNodeTmp[i] = tmp2[i] + dt/2.0*dyt[i];
-
-		}
-		//! dritter Schritt
-		virtual void action3(baseType dt) {
-			(*this)(this->x, &dym[0]);
-			for (unsigned int i = 0; i < this->dimension(); i++)
-				this->odeNodeTmp[i] = tmp2[i] + dt*dym[i];
-			dym += dyt;
-		}
-		//! vierter Schritt
-		virtual void action4(baseType dt) {
-			(*this)(this->x, &dyt[0]);
-			for (unsigned int i = 0; i <this->dimension(); i++)
-				this->odeNodeTmp[i] = tmp2[i] + dt/6.0*(dydt[i] + dyt[i] + ((baseType)2.0)*dym)[i];
-		}
-
 	};
-
-//	typedef odeNode stdOdeIntegrator;   // Runge-Kutta Ord4
 
 }
 
