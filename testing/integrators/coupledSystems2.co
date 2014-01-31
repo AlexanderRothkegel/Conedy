@@ -1,13 +1,15 @@
 double startwerta = 0.234908;
 double startwertb = 0.018974;
-double a = 0.9934;
-double b = 1.0002349;
-double gewicht = 1.000285;
+double a = 0.1029;
+double b = -0.23947;
+double gewicht = 3.23948720;
 
 
 odeStepSize = 0.001;
 
 network N;
+
+# ––––––––––––––––––––––––––––
 
 int j = N.completeNetwork(2, onlyCoupling(), staticWeightedEdge());
 N.randomizeWeights(constant(gewicht));
@@ -21,16 +23,45 @@ N.clear();
 
 odeStepSize = 0.001;
 
+# ––––––––––––––––––––––––––––
+
+j = N.completeNetwork(2, onlyCouplingB(), staticWeightedEdge());
+N.randomizeWeights(constant(gewicht));
+N.setState(j, startwerta);
+N.setState(j+1, startwertb);
+N.setParam(j, "onlyCouplingB_a", a);
+N.setParam(j+1, "onlyCouplingB_a", b);
+N.observe(j, "output/tmp_single_static", component(0));
+N.evolve(0.0,40.0);
+N.clear();
+
+odeStepSize = 0.001;
+
+# ––––––––––––––––––––––––––––
+
 j = N.completeNetwork(2, onlyCouplingCouplingSum(), staticWeightedEdge());
 N.randomizeWeights(constant(gewicht));
 N.setState(j, startwerta);
 N.setState(j+1, startwertb);
-N.setParam(j, "onlyCoupling_a", a);
-N.setParam(j+1, "onlyCoupling_a", b);
+N.setParam(j, "onlyCouplingCouplingSum_a", a);
+N.setParam(j+1, "onlyCouplingCouplingSum_a", b);
 N.observe(j, "output/tmp_singleCouplingSum", component(0));
 N.evolve(0.0,40.0);
 N.clear();
 
+# ––––––––––––––––––––––––––––
+
+j = N.completeNetwork(2, onlyCouplingCouplingSumB(), staticWeightedEdge());
+N.randomizeWeights(constant(gewicht));
+N.setState(j, startwerta);
+N.setState(j+1, startwertb);
+N.setParam(j, "onlyCouplingCouplingSumB_a", a);
+N.setParam(j+1, "onlyCouplingCouplingSumB_a", b);
+N.observe(j, "output/tmp_singleCouplingSum_static", component(0));
+N.evolve(0.0,40.0);
+N.clear();
+
+# ––––––––––––––––––––––––––––
 
 odeStepSize = 0.001;
 
@@ -42,7 +73,7 @@ N.observe(k, "output/tmp_double", component(0));
 N.evolve(0.0,40.0);
 N.clear();
 
-
+# ––––––––––––––––––––––––––––
 
 #print "Should print nothing for identical files:";
 :"paste output/tmp_single output/tmp_double | awk '{print $1-$2 > 0.00001; print $2 - $1 > 0.00001  }'  ":;

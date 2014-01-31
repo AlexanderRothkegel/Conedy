@@ -6,6 +6,7 @@ double b = -1.0;
 
 odeStepSize = 0.001;
 
+# ––––––––––––––––––––––––––––
 
 network N;
 
@@ -21,7 +22,21 @@ N.observe(j, "output/coupledSystems.co.single", component(0));
 N.evolve(0.0,100.0);
 N.clear();
 
+# ––––––––––––––––––––––––––––
 
+j = N.completeNetwork(2, onlyCouplingB(), staticWeightedEdge());
+N.randomizeWeights(constant(1.0));
+N.setState(j, startwerta);
+N.setState(j+1, startwertb);
+N.setParam(j, "onlyCouplingB_a", a);
+N.setParam(j+1, "onlyCouplingB_a", b);
+N.observe(j, "output/coupledSystems.co.single_static", component(0));
+
+
+N.evolve(0.0,100.0);
+N.clear();
+
+# ––––––––––––––––––––––––––––
 
 odeStepSize = 0.001;
 
@@ -29,12 +44,29 @@ j = N.completeNetwork(2, onlyCouplingCouplingSum(), staticWeightedEdge());
 N.randomizeWeights(constant(1.0));
 N.setState(j, startwerta);
 N.setState(j+1, startwertb);
-N.setParam(j, "onlyCoupling_a", a);
-N.setParam(j+1, "onlyCoupling_a", b);
+N.setParam(j, "onlyCouplingCouplingSum_a", a);
+N.setParam(j+1, "onlyCouplingCouplingSum_a", b);
 N.observe(j, "output/coupledSystems.co.singleCouplingSum", component(0));
 N.evolve(0.0,100.0);
 N.clear();
 
+
+# ––––––––––––––––––––––––––––
+
+odeStepSize = 0.001;
+
+j = N.completeNetwork(2, onlyCouplingCouplingSumB(), staticWeightedEdge());
+N.randomizeWeights(constant(1.0));
+N.setState(j, startwerta);
+N.setState(j+1, startwertb);
+N.setParam(j, "onlyCouplingCouplingSumB_a", a);
+N.setParam(j+1, "onlyCouplingCouplingSumB_a", b);
+N.observe(j, "output/coupledSystems.co.singleCouplingSum_static", component(0));
+N.evolve(0.0,100.0);
+N.clear();
+
+
+# ––––––––––––––––––––––––––––
 
 odeStepSize = 0.001;
 
@@ -45,6 +77,8 @@ N.setParam(k, "doubleOnlyCoupling_b", b);
 N.observe(k, "output/coupledSystems.co.double", component(0));
 N.evolve(0.0,100.0);
 N.clear();
+
+# ––––––––––––––––––––––––––––
 
 :"diff output/coupledSystems.co.single output/coupledSystems.co.double":;
 :"diff output/coupledSystems.co.singleCouplingSum output/coupledSystems.co.double":;
