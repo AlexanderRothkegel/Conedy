@@ -8,7 +8,6 @@ n.observeTime("output/compareWithExponential.co.static");
 n.observeAll("output/compareWithExponential.co.static");
 n.evolve (0.0,10.0);
 n.removeObserver();
-n.dynamics(0);
 n.clear();
 
 nodeNumber = n.addNode(exponentialGsl());

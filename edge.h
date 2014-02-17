@@ -83,6 +83,7 @@ namespace conedy
 
 		public:
 			staticWeightedEdge() {};
+			staticWeightedEdge(baseType w) {weight = w; };
 			//			staticWeightedEdge ( node* t ) : weightedEdge(t) {};
 //			staticWeightedEdge (baseType newWeight = 1)  {    weight = newWeight;};
 
