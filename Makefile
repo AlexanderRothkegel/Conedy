@@ -158,10 +158,11 @@ unstripped: clean addNodes Scanner.ll Parser.yy
 
 # build the bison-flex-interpreter of Conedy.     fix to the strange behavior of statically linking stdc++
 conedy: addNodesIfNecessary Parser.yy Scanner.ll string_config.h
-	bjam  conedy cflags=-D$(SVNDEV) $(addprefix cflags=-D,${defines})  cflags='-DARCHITECTURE="${ARCH}"'  -j${numberCores} -n  | grep "end-group" | sed "s/-Wl,-Bstatic/-static/g;s/-Wl,-Bdynamic//g;" > linkStatic.sh
+#	bjam  conedy cflags=-D$(SVNDEV) $(addprefix cflags=-D,${defines})  cflags='-DARCHITECTURE="${ARCH}"'  -j${numberCores} -n  | grep "end-group" | sed "s/-Wl,-Bstatic/-static/g;s/-Wl,-Bdynamic//g;" > linkStatic.sh
+	bjam  conedy cflags=-D$(SVNDEV) $(addprefix cflags=-D,${defines})  cflags='-DARCHITECTURE="${ARCH}"'  -j${numberCores} -n  | grep "end-group"  > linkStatic.sh
 	bjam  conedy cflags=-D$(SVNDEV) $(addprefix cflags=-D,${defines})  cflags='-DARCHITECTURE="${ARCH}"'  -j${numberCores}
-	bash linkStatic.sh
-	rm linkStatic.sh
+#	bash linkStatic.sh
+#	rm linkStatic.sh
 
 
 

@@ -85,10 +85,9 @@ namespace conedy
 
 
 			containerNode ( const containerNode & c ) : dynNode ( c ), p ( _containerNode_ )
-			{
+		{
 
 			free( this->x);
-			//cout << "Copy-Konstruktor" << endl;
 
 			if ( usedIndices == 0 )    // first node in the container. Reserve memory according two gslOdeNode_arraySize
 			{
