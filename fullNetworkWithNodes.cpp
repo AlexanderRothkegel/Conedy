@@ -11,13 +11,7 @@ void registerStandards()
 	dynNetwork::registerStandardValues();
 //	createNetwork::registerStandardValues();
 	escapeNoiseNeuron::registerStandardValues();
-#ifdef DOUBLE
-	gslOdeNode::registerStandardValues();
-#endif
-
-#ifdef LDOUBLE
 	stdOdeIntegrator::registerStandardValues();
-#endif
 
 	network::registerStandardValues();
 	pcoDelay::registerStandardValues();
