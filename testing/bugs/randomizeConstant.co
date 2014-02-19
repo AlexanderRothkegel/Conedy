@@ -12,10 +12,14 @@ print " " + N.getState(i,0) + newline;
 setRandomSeed(42);
 
 N.randomizeWeights(constant(1.0));
-#N.randomizeParameter ("logisticMap_r", constant(3.58));
-#N.randomizeParameter ("roessler_omega", constant(1.0));
 
 N.randomizeStates(logisticMap, gaussian(0.15, 0.1));
 
 print " " + N.getState(i,0) + newline;
 
+
+
+
+
+#N.randomizeParameter ("logisticMap_r", constant(3.58));
+#N.randomizeParameter ("roessler_omega", constant(1.0));

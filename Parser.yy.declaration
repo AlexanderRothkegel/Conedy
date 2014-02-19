@@ -376,8 +376,10 @@ random		: GAUSSIAN '(' baseType ',' baseType ')'
   { $$ = new bindExpression<baseType>(bind(gslNoise::getPoisson, bind(&expression<baseType>::evaluate, $3))); }
 		| POISSON '(' baseType ',' baseType ')'
  { $$ = new bindExpression<baseType>(bind(gslNoise::getPoisson, bind(&expression<baseType>::evaluate, $3), _E(baseType,$5))); }
-		| CONSTANT '(' baseType ')'
- { $$ = new bindExpression<baseType>(bind(&gslNoise::getGaussian, _E(baseType, $3), 0)); }
+		| CONSTANT '(' baseType ')' { $$ = new bindExpression<baseType>(bind(&expression<baseType>::evaluate, $3));   }
+
+
+//new bindExpression<baseType>(bind(&gslNoise::getGaussian, _E(baseType, $3), 0)); }
 		| FROMFILE '(' string ')'
 	 {
 		ifstream *is = new ifstream ( $3->evaluate().c_str());
