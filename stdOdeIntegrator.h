@@ -31,13 +31,18 @@ namespace conedy {
 		}
 
 		static unsigned int stepType_int;
+		bool adaptable;
 
 		static void registerStandardValues()
 		{
-			registerGlobal<string>("odeStepType", "euler");
-			registerGlobal<baseType>("odeStepSize", 0.00001);
+			registerGlobal<string>("odeStepType", "rkf45");
+			registerGlobal<baseType>("odeRelError", 0.00001);
+			registerGlobal<baseType>("odeAbsError", 0.0);
+			registerGlobal<baseType>("odeStepSize", 0.001);
+			registerGlobal<baseType>("odeMinStepSize", 0.000001);
+			registerGlobal<bool>("odeIsAdaptive", true);
 		}
-
+		
 		virtual void swap()
 		{
 			for ( unsigned int i = 0; i < this->dimension(); i++ )
@@ -55,11 +60,19 @@ namespace conedy {
 				{
 					stepType_int = 0;
 					integ = new euler (containerDimension() );
+					adaptable = false;
 				}
 				else if (stepType == "rk4")
 				{
 					stepType_int = 1;
 					integ = new rk4 (containerDimension() );
+					adaptable = false;
+				}
+				else if (stepType == "rkf45")
+				{
+					stepType_int = 2;
+					integ = new rkf45 (containerDimension() );
+					adaptable = true;
 				}
 				else
 				throw "unknown steptype for odeStepType!";
@@ -70,19 +83,52 @@ namespace conedy {
 
 		virtual void evolve(baseType timeTilEvent)
 		{
-			unsigned int stepCount = timeTilEvent/getGlobal<baseType>("odeStepSize") + 1.0 - 1e-8;
-			double dt = timeTilEvent / stepCount;
-
-			for (unsigned int i = 0; i < stepCount; i++)
+			if (getGlobal<bool>("odeIsAdaptive"))
 			{
-				if (stepType_int)
-					((rk4 *) integ)->step (dt, dynamicVariablesOfAllDynNodes, *this, containerDimension());
+				if (adaptable)
+				{
+					// with stepsize control
+					baseType time = 0.0;
+					while (time < timeTilEvent)
+					{
+						((rkf45 *) integ)->step (
+								timeTilEvent-time, dynamicVariablesOfAllDynNodes, *this, containerDimension(),
+								true,
+								getGlobal<double>("odeAbsError"), getGlobal<double>("odeRelError"),
+								getPointerToGlobal<baseType>("odeStepSize"),
+								&time
+							);
+						
+						if (getGlobal<baseType>("odeStepSize") < getGlobal<baseType>("odeMinStepSize"))
+							throw "Stepsize crossed specified minimum (odeMinStepSize). Aborting!";
+					}
+				}
 				else
-					((euler *) integ)->step (dt, dynamicVariablesOfAllDynNodes, *this, containerDimension());
+					throw "Chosen integrator is not adaptable. Aborting!";
+			}
+			else
+			{
+				unsigned int stepCount = timeTilEvent/getGlobal<baseType>("odeStepSize") + 1.0 - 1e-8;
+				double dt = timeTilEvent / stepCount;
+
+				for (unsigned int i = 0; i < stepCount; i++)
+				{
+					switch (stepType_int)
+					{
+						case 0:
+							((euler *) integ)->step (dt, dynamicVariablesOfAllDynNodes, *this, containerDimension());
+							break;
+						case 1:
+							((rk4 *) integ)->step (dt, dynamicVariablesOfAllDynNodes, *this, containerDimension());
+							break;
+						case 2:
+							((rkf45 *) integ)->step (dt, dynamicVariablesOfAllDynNodes, *this, containerDimension(), false);
+							break;
+					}
+				}
 			}
 		}
 	};
-
 }
 
 #endif
