@@ -39,7 +39,7 @@ namespace conedy {
 			registerGlobal<baseType>("odeRelError", 0.00001);
 			registerGlobal<baseType>("odeAbsError", 0.0);
 			registerGlobal<baseType>("odeStepSize", 0.001);
-			registerGlobal<baseType>("odeMinStepSize", 0.000001);
+			registerGlobal<baseType>("odeMinStepSize", 0.0000001);
 			registerGlobal<bool>("odeIsAdaptive", true);
 		}
 		
@@ -91,13 +91,15 @@ namespace conedy {
 					baseType time = 0.0;
 					while (time < timeTilEvent)
 					{
-						((rkf45 *) integ)->step (
-								timeTilEvent-time, dynamicVariablesOfAllDynNodes, *this, containerDimension(),
-								true,
-								getGlobal<double>("odeAbsError"), getGlobal<double>("odeRelError"),
-								getPointerToGlobal<baseType>("odeStepSize"),
-								&time
-							);
+						if (stepType_int == 2)
+							((rkf45 *) integ)->step (
+									timeTilEvent-time, dynamicVariablesOfAllDynNodes, *this, containerDimension(),
+									true,
+									getGlobal<baseType>("odeAbsError"), getGlobal<baseType>("odeRelError"),
+									getPointerToGlobal<baseType>("odeStepSize"),
+									&time,
+									getGlobal<baseType>("odeMinStepSize")
+								);
 						
 						if (getGlobal<baseType>("odeStepSize") < getGlobal<baseType>("odeMinStepSize"))
 							throw "Stepsize crossed specified minimum (odeMinStepSize). Aborting!";

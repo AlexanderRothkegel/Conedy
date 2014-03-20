@@ -148,21 +148,30 @@ class rkf45 : public odeIntegrator
 	template <typename dgl>
 		void step (
 					const double maxdt, baseType * const state, dgl &func, const unsigned int size,
-					const bool adaptive,
+					bool adaptive,
 					const baseType absError = 0.0, const baseType relError = 0.0,
 					baseType * const stepSize = NULL,
-					baseType * const time = NULL
+					baseType * const time = NULL,
+					const baseType minStepSize = 0.0000001
 				)
 		{
-			baseType maxerrorrel = 0.0;
+			baseType maxerrorrel;
 			baseType dt = maxdt;
+			baseType error;
+			baseType threshold;
+			
+			func.dgl(state,dxdt);
 			
 			do
 			{
 				if (adaptive)
+				{
 					dt = fmin(*stepSize, maxdt);
+					if (maxdt - dt < minStepSize)
+						dt = maxdt;
+				}
 				
-				func.dgl(state,dxdt);
+				start:
 				
 				for (unsigned int i = 0; i < size; i++)
 					intermediateState[i] = state[i]
@@ -171,20 +180,20 @@ class rkf45 : public odeIntegrator
 				
 				for (unsigned int i = 0; i < size; i++)
 					intermediateState[i] = state[i] + dt * (
-								dxdt [i] * 3
+								  dxdt [i] * 3
 								+ dxdt2[i] * 9) / 32.0;
 				func.dgl(intermediateState,dxdt3);
 				
 				for (unsigned int i = 0; i < size; i++)
 					intermediateState[i] = state[i] + dt * (
-								dxdt [i] * 1932
+								  dxdt [i] * 1932
 								- dxdt2[i] * 7200
 								+ dxdt3[i] * 7296) / 2197.0;
 				func.dgl(intermediateState,dxdt4);
 				
 				for (unsigned int i = 0; i < size; i++)
 					intermediateState[i] = state[i] + dt *(
-								dxdt [i] * 439 / 216.0
+								  dxdt [i] * 439 / 216.0
 								- dxdt2[i] * 8
 								+ dxdt3[i] * 3680 / 513.
 								- dxdt4[i] * 845 / 4104.0);
@@ -201,7 +210,7 @@ class rkf45 : public odeIntegrator
 				
 				for (unsigned int i = 0; i < size; i++)
 				dy[i] = dt * (
-								+ dxdt [i] * 25 / 216.
+								  dxdt [i] * 25 / 216.
 								+ dxdt3[i] * 1408 / 2565.
 								+ dxdt4[i] * 2197 / 4104.
 								- dxdt5[i] * 1 / 5.);
@@ -213,30 +222,42 @@ class rkf45 : public odeIntegrator
 					
 					for (unsigned int i = 0; i < size; i++)
 					{
-						baseType errorrel = fabs(dy[i] - dt *(
-											+ dxdt [i] * 16 / 135.
+						error = fabs(dy[i] - dt * (
+											  dxdt [i] * 16 / 135.
 											+ dxdt3[i] * 6656 / 12825.
 											+ dxdt4[i] * 28561 / 56430.
 											- dxdt5[i] * 9 / 50.
 											+ dxdt6[i] * 2 / 55.)
-											)/(absError + relError * state[i]);
-						if (errorrel > maxerrorrel)
-							maxerrorrel = errorrel;
-						if (errorrel > 1.1)
-							*stepSize *= fmax(0.9 * pow(errorrel, -1/4), 5.0);
+											);
+						threshold = fabs(absError + relError * state[i]);
+						
+						if (threshold == 0.0)
+						{
+							printf("Warning: Computed error threshold for adaptive integration is zero. This is most likely because your starting value as well as your absolute error threshold were both exactly zero. Trying to resolve situation by performing one step with minimum step size.\n");
+							adaptive = false;
+							dt = fmin(minStepSize, maxdt);
+							goto start;
+						}
+						
+						if (error/threshold > maxerrorrel)
+							maxerrorrel = error/threshold;
 					}
-				
-					if (maxerrorrel < 0.5)
-						*stepSize *= fmin( 0.9 * pow(maxerrorrel, -1/5.0), 0.1 );
+					
+					if (maxerrorrel > 1.1)
+						*stepSize *= fmax( 0.9 / pow(maxerrorrel, 0.25), 0.2 );
+					else if ((maxerrorrel < 0.5) and (maxdt > *stepSize))
+					{
+						*stepSize *= fmax(1.0, fmin( 0.9 / pow(maxerrorrel, 0.2), 5.0 ) );
+						*stepSize = fmin(maxdt, *stepSize);
+					}
 				}
-				
 			}
-			while(maxerrorrel>1.1);
+			while(adaptive and (maxerrorrel>1.1));
 			
 			for (unsigned int i = 0; i < size; i++)
 				state[i] += dy[i];
 			
-			if (adaptive)
+			if (time != NULL)
 				*time += dt;
 		}
 };
