@@ -157,8 +157,7 @@ class rkf45 : public odeIntegrator
 		{
 			baseType maxerrorrel;
 			baseType dt = maxdt;
-			baseType error;
-			baseType threshold;
+			baseType errorrel;
 			
 			func.dgl(state,dxdt);
 			
@@ -170,8 +169,6 @@ class rkf45 : public odeIntegrator
 					if (maxdt - dt < minStepSize)
 						dt = maxdt;
 				}
-				
-				start:
 				
 				for (unsigned int i = 0; i < size; i++)
 					intermediateState[i] = state[i]
@@ -222,25 +219,16 @@ class rkf45 : public odeIntegrator
 					
 					for (unsigned int i = 0; i < size; i++)
 					{
-						error = fabs(dy[i] - dt * (
+						errorrel = fabs((dy[i] - dt * (
 											  dxdt [i] * 16 / 135.
 											+ dxdt3[i] * 6656 / 12825.
 											+ dxdt4[i] * 28561 / 56430.
 											- dxdt5[i] * 9 / 50.
 											+ dxdt6[i] * 2 / 55.)
-											);
-						threshold = fabs(absError + relError * state[i]);
+											)/(absError + relError * (state[i]+dy[i])));
 						
-						if (threshold == 0.0)
-						{
-							printf("Warning: Computed error threshold for adaptive integration is zero. This is most likely because your starting value as well as your absolute error threshold were both exactly zero. Trying to resolve situation by performing one step with minimum step size.\n");
-							adaptive = false;
-							dt = fmin(minStepSize, maxdt);
-							goto start;
-						}
-						
-						if (error/threshold > maxerrorrel)
-							maxerrorrel = error/threshold;
+						if (errorrel > maxerrorrel)
+							maxerrorrel = errorrel;
 					}
 					
 					if (maxerrorrel > 1.1)
