@@ -35,8 +35,6 @@ class networkTemplate;
 
 
 typedef dynNode nodeBlueprint;
-
-//class edgeVirtual;
 typedef edgeVirtual edgeBlueprint;
 
 

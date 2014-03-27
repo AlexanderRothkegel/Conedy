@@ -178,7 +178,7 @@ namespace conedy
 
 
 
-	bool match (nodeBlueprint *l, nodeDescriptor r)
+	bool match (dynNode *l, nodeDescriptor r)
 	{
 		if (l->getNodeInfo().theNodeKind == _dynNode_  && match (r, _dynNode_))
 			return true;
@@ -199,7 +199,7 @@ namespace conedy
 				
 	}
 
-	bool match (nodeDescriptor l, nodeBlueprint *r) {return match (r,l); } 
+	bool match (nodeDescriptor l, dynNode *r) {return match (r,l); } 
 
 
 

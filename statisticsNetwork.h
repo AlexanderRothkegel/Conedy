@@ -50,7 +50,7 @@ namespace conedy
 			void closenessCentrality ( string filename );
 			void betweennessCentrality ( string filename );
 
-
+			
          void saveAdjacencyMatrix (string fileName);
 
 			unsigned int countEdges (edgeVirtual *e);
@@ -58,6 +58,8 @@ namespace conedy
 			void inDegreeDistributionToFile ( string fileName );
 
 			void saveAdjacencyList(string fileName);
+
+
 			void saveGraphML(string fileName);
 
 

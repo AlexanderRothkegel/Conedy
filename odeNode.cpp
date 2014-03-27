@@ -18,8 +18,8 @@ namespace conedy {
 					( * ((odeNode*) * it) )
 							( &y[ ( *it )->startPosGslOdeNodeArray],
 							 &f[ ( *it )->startPosGslOdeNodeArray] );
-				return SUCCESS;
 				containerNode<baseType,1>::dynamicVariablesOfAllDynNodes = originalNodeStates;
+				return SUCCESS;
 
 	}
 
@@ -34,8 +34,8 @@ namespace conedy {
 					(* ((odeNode*) *it) ) 
 							( &y[ ( *it )->startPosGslOdeNodeArray],
 							 &f[ ( *it )->startPosGslOdeNodeArray] );
-				return;
 				containerNode<baseType,1>::dynamicVariablesOfAllDynNodes = originalNodeStates;
+				return;
 
 
 	}
