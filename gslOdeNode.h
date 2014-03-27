@@ -53,7 +53,9 @@ namespace conedy
 			static bool alreadyInitialized;
 			static bool gslFixedStepSizeWarningShown;
 
+
 		public:
+
 			static void registerStandardValues()
 			{
 				registerGlobal<string>("odeStepType", "gsl_rkf45");
