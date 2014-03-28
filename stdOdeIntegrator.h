@@ -30,8 +30,13 @@ namespace conedy {
 
 		}
 
+	
 		static unsigned int stepType_int;
-		bool adaptable;
+		static bool adaptable;
+		static baseType * absError;
+		static baseType * relError;
+		static baseType * stepSize;
+		static baseType * minStepSize;
 
 		static void registerStandardValues()
 		{
@@ -41,6 +46,10 @@ namespace conedy {
 			registerGlobal<baseType>("odeStepSize", 0.001);
 			registerGlobal<baseType>("odeMinStepSize", 0.0000001);
 			registerGlobal<bool>("odeIsAdaptive", true);
+			absError = getPointerToGlobal<baseType>("odeAbsError");
+			relError = getPointerToGlobal<baseType>("odeRelError");
+			stepSize = getPointerToGlobal<baseType>("odeStepSize");
+			minStepSize = getPointerToGlobal<baseType>("odeMinStepSize");
 		}
 		
 		virtual void swap()
@@ -95,13 +104,13 @@ namespace conedy {
 							((rkf45 *) integ)->step (
 									timeTilEvent-time, dynamicVariablesOfAllDynNodes, *this, containerDimension(),
 									true,
-									getGlobal<baseType>("odeAbsError"), getGlobal<baseType>("odeRelError"),
-									getPointerToGlobal<baseType>("odeStepSize"),
+									*absError, *relError,
+									stepSize,
 									&time,
-									getGlobal<baseType>("odeMinStepSize")
+									*minStepSize
 								);
 						
-						if (getGlobal<baseType>("odeStepSize") < getGlobal<baseType>("odeMinStepSize"))
+						if (*stepSize < *minStepSize)
 							throw "Stepsize crossed specified minimum (odeMinStepSize). Aborting!";
 					}
 				}
