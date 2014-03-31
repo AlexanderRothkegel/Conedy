@@ -32,7 +32,7 @@ namespace conedy {
 
 	
 		static unsigned int stepType_int;
-		static bool adaptable;
+		bool adaptable;
 		static baseType * absError;
 		static baseType * relError;
 		static baseType * stepSize;

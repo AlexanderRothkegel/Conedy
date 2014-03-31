@@ -4,7 +4,7 @@
 #include "baseType.h"
 #include <iomanip>
 
-#ifdef DOUBLE
+#ifndef NOGSL
 
 #include "node.h"
 #include "params.h"
