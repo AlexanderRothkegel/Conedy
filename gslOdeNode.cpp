@@ -2,7 +2,7 @@
 
 
 
-#ifdef DOUBLE
+#ifndef NOGSL
 
 #include <gsl/gsl_errno.h>
 

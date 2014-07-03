@@ -1,49 +1,32 @@
-
-
 #ifndef baseType_h
-#define baseType_h baseType_h
+	#define baseType_h baseType_h
+
+	//using namespace boost;
 
 
 
-//#include "realRational.h"
-
-//#include "aquafixed.h"
-
-//using namespace boost;
+	#define PRECALCULATEWEIGHTSUM
 
 
-
-#define PRECALCULATEWEIGHTSUM
-
-
-//#define CALENDARQUEUE
+	//#define CALENDARQUEUE
 
 
-#ifdef DOUBLE
-typedef double baseType;
+	#ifdef DOUBLE
+		typedef double baseType;
 
-#elif defined LDOUBLE
-typedef long double baseType;
+	#elif defined LDOUBLE
+		typedef long double baseType;
+		#define NOGSL
 
-#elif defined FLOAT
-typedef float baseType;
+	#elif defined FLOAT
+		typedef float baseType;
+		#define NOGSL
 
-#else
+	#else
+		#define DOUBLE
+		typedef double baseType;
 
-#define DOUBLE
-typedef double baseType;
-
-#endif
-
-
-
-
-//typedef Aqua::fixed_t baseType;
-
-
-
-
-//typedef rational<int> baseType;
+	#endif
 
 #endif
 
