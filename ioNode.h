@@ -25,13 +25,13 @@
 namespace io = boost::iostreams;
 using namespace std;
 // using namespace boost::iostreams::zlib;
+#include <iostream>
 // using namespace boost;
-using namespace boost::iostreams;
+// using namespace boost::iostreams;
 
 // TODO: Fehlermeldung, wenn Datei nicht geöffnet werden kann. (Wegen Verzeichnis oder so)
 
 
-#include <iostream>
 
 
 

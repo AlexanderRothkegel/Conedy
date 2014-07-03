@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <fstream>
 #include <boost/python.hpp>
@@ -199,7 +198,7 @@ template <class N>
 	}
 
 
-	using namespace boost::python;
+// 	using namespace boost::python;
 
 	int i;
 
@@ -250,7 +249,7 @@ template <class N>
 	BOOST_PYTHON_MODULE(conedy)
 	{
 
-		register_exception_translator<const char *>(translator);
+		boost::python::register_exception_translator<const char *>(translator);
 
 #if RECOMPILE
 
@@ -273,11 +272,11 @@ template <class N>
 		//	scope current;
 		//	current.attr("aa") = &i;
 
-		object o = object (i);
+		boost::python::object o = boost::python::object (i);
 
 		//	scope().attr("aa") = &i;
 
-		scope().attr("__doc__") =
+		boost::python::scope().attr("__doc__") =
 			"What is Conedy"
 			"================"
 			"Conedy is a tool which allows you to integrate networks where each node is represented by some dynamical system. It is designed to allow for an change of the network structure or differential equation sperarately. ";
@@ -292,26 +291,26 @@ template <class N>
 		// Add regular functions to the module.
 
 
-		def("set", &globals::setGlobal<baseType>);
-		def("set", &globals::setGlobal<string>);
-		def("set", &globals::setGlobal<bool>);
-		def("set", &globals::setGlobal<int>);
-		def("get", &globals::getGlobal<baseType>);
-		def("get", &globals::getGlobal<string>);
-		def("get", &globals::getGlobal<bool>);
-		def("get", &globals::getGlobal<int>);
-		def("setRandomSeed", &gslNoise::setSeed);
+		boost::python::def("set", &globals::setGlobal<baseType>);
+		boost::python::def("set", &globals::setGlobal<string>);
+		boost::python::def("set", &globals::setGlobal<bool>);
+		boost::python::def("set", &globals::setGlobal<int>);
+		boost::python::def("get", &globals::getGlobal<baseType>);
+		boost::python::def("get", &globals::getGlobal<string>);
+		boost::python::def("get", &globals::getGlobal<bool>);
+		boost::python::def("get", &globals::getGlobal<int>);
+		boost::python::def("setRandomSeed", &gslNoise::setSeed);
 
-		class_<createNetwork>("createNetwork");
-		class_<statisticsNetwork>("statisticsNetwork");
-		class_<spatialNetwork>("spatialNetwork");
+		boost::python::class_<createNetwork>("createNetwork");
+		boost::python::class_<statisticsNetwork>("statisticsNetwork");
+		boost::python::class_<spatialNetwork>("spatialNetwork");
 
-		class_<network>("net");
-		class_<dynNetwork, bases <network> >("dynNetwork");
+		boost::python::class_<network>("net");
+		boost::python::class_<dynNetwork, boost::python::bases <network> >("dynNetwork");
 	
-		class_<networkTemplate, bases <createNetwork, dynNetwork, statisticsNetwork, spatialNetwork> >("network")
+		boost::python::class_<networkTemplate, boost::python::bases <createNetwork, dynNetwork, statisticsNetwork, spatialNetwork> >("network")
 			//	 class_<networkTemplate >("directedNetwork")
-			.def("__init__", make_constructor(directedNetworkFactory))
+			.def("__init__", boost::python::make_constructor(directedNetworkFactory))
 			.def("__del__", &networkTemplate::clear, reinterpret_cast<const char *>(__network_clear))
 
 
@@ -412,17 +411,17 @@ template <class N>
 		//	 class ("random", boost::function<double ()>);
 		//
 
-		class_<boost::function<double ()> > ("random");
+		boost::python::class_<boost::function<double ()> > ("random");
 
-		def ("uniform", &gslNoise::functionUniform);
-		def ("constant", &gslNoise::functionConstant);
-		def ("gaussian", &gslNoise::functionGaussian);
-		def ("bimodal", &gslNoise::functionBimodal);
-		def ("powerLaw", &gslNoise::functionPowerLaw);
+		boost::python::def ("uniform", &gslNoise::functionUniform);
+		boost::python::def ("constant", &gslNoise::functionConstant);
+		boost::python::def ("gaussian", &gslNoise::functionGaussian);
+		boost::python::def ("bimodal", &gslNoise::functionBimodal);
+		boost::python::def ("powerLaw", &gslNoise::functionPowerLaw);
 
 
 
-		class_<nodeBlueprint> ("nodeBlueprint")
+		boost::python::class_<nodeBlueprint> ("nodeBlueprint")
 			.def("setState", &dynNode::setState, setStateTemplate_overloads ( reinterpret_cast <const char *> (__dynNetwork_setState)))  ;
 
 
@@ -432,64 +431,64 @@ template <class N>
 
 
 
-		//	class_< edgeVirtual, bases <edgeBlueprint> > ("unweightedEdge");
+		//	class_< edgeVirtual, boost::python::bases <edgeBlueprint> > ("unweightedEdge");
 
-		class_< nodeVirtualEdges < dynNode >, bases <nodeBlueprint> > ("node");
+		boost::python::class_< nodeVirtualEdges < dynNode >, boost::python::bases <nodeBlueprint> > ("node");
 
 		revealNodesToPython();
 
 
-		class_<edgeBlueprint> ("edge");
+		boost::python::class_<edgeBlueprint> ("edge");
 
 
-		class_< weightedEdge < edgeVirtual >, bases <edgeBlueprint> > ("weightedEdge",   reinterpret_cast<const char *>(__edges_weightedEdge)       ). def (init<baseType>());
+		boost::python::class_< weightedEdge < edgeVirtual >, boost::python::bases <edgeBlueprint> > ("weightedEdge",   reinterpret_cast<const char *>(__edges_weightedEdge)       ). def (boost::python::init<baseType>());
 
-		class_< staticWeightedEdge < edgeVirtual >  , bases <edgeBlueprint> > ("staticWeightedEdge", reinterpret_cast<const char *>(__edges_staticWeightedEdge)   ).
-			def (init <baseType> ());
-
-
-
-		class_< component < edgeVirtual > , bases <edgeBlueprint> >("component", reinterpret_cast<const char *>(__edges_component))
-					.def ("__init__", make_constructor (edgeFactory1 <component< edgeVirtual > > ));
-		class_< component < weightedEdgeVirtual>, bases <edgeBlueprint>   > ("component_weightedEdge" ,reinterpret_cast<const char *>(__edges_weightedEdge))
-					.def ("__init__", make_constructor (edgeFactory2 <component< weightedEdgeVirtual > > ));
-
-		class_< component < staticWeightedEdgeVirtual>, bases <edgeBlueprint>  >("component_staticWeightedEdge" ,reinterpret_cast<const char *>(__edges_component_staticWeightedEdge))
-					.def ("__init__", make_constructor (edgeFactory2 <component< staticWeightedEdgeVirtual > > ));
+		boost::python::class_< staticWeightedEdge < edgeVirtual >  , boost::python::bases <edgeBlueprint> > ("staticWeightedEdge", reinterpret_cast<const char *>(__edges_staticWeightedEdge)   ).
+			def (boost::python::init <baseType> ());
 
 
 
-		class_< staticComponent < edgeVirtual > , bases <edgeBlueprint> >("staticComponent", reinterpret_cast<const char *>(__edges_component))
-					.def ("__init__", make_constructor (edgeFactory1 <staticComponent < edgeVirtual > > ));
+		boost::python::class_< component < edgeVirtual > , boost::python::bases <edgeBlueprint> >("component", reinterpret_cast<const char *>(__edges_component))
+					.def ("__init__", boost::python::make_constructor (edgeFactory1 <component< edgeVirtual > > ));
+		boost::python::class_< component < weightedEdgeVirtual>, boost::python::bases <edgeBlueprint>   > ("component_weightedEdge" ,reinterpret_cast<const char *>(__edges_weightedEdge))
+					.def ("__init__",boost::python::make_constructor (edgeFactory2 <component< weightedEdgeVirtual > > ));
 
-		class_< staticComponent < weightedEdgeVirtual>, bases <edgeBlueprint>   > ("staticComponent_weightedEdge" ,reinterpret_cast<const char *>(__edges_weightedEdge))
-					.def ("__init__", make_constructor (edgeFactory2 <staticComponent < weightedEdgeVirtual> > ));
-		class_< staticComponent < staticWeightedEdgeVirtual>, bases <edgeBlueprint>  >("staticComponent_staticWeightedEdge" ,reinterpret_cast<const char *>(__edges_component_staticWeightedEdge))
-					.def ("__init__", make_constructor (edgeFactory2 <staticComponent < staticWeightedEdgeVirtual> > ));
-
-
-		class_< randomTarget < edgeVirtual>, bases <edgeBlueprint>  > ("randomTarget",  reinterpret_cast<const char *>(__edges_randomTarget))
-					.def ("__init__", make_constructor (edgeFactory2 < randomTarget < edgeVirtual>   > ));
-		class_< randomTarget < weightedEdgeVirtual>, bases <edgeBlueprint>  > ("randomTarget_weightedEdge",  reinterpret_cast<const char *>(__edges_weightedEdge))
-					.def ("__init__", make_constructor (edgeFactory3 < randomTarget < weightedEdgeVirtual>   > ));
-		class_< randomTarget < staticWeightedEdgeVirtual>, bases <edgeBlueprint>  >("randomTarget_staticWeightedEdge", reinterpret_cast<const char *>(__edges_randomTarget_staticWeightedEdge))
-					.def ("__init__", make_constructor (edgeFactory3 < randomTarget < staticWeightedEdgeVirtual>   > ));
-
-		class_< stepEdge < edgeVirtual>, bases <edgeBlueprint>  > ("step" ,reinterpret_cast<const char *>(__edges_stepEdge))
-					.def ("__init__", make_constructor (edgeFactory1 < stepEdge <edgeVirtual > > ));
-		class_< stepEdge < weightedEdgeVirtual>, bases <edgeBlueprint>  > ("step_weightedEdge", reinterpret_cast<const char *>(__edges_weightedEdge))
-					.def ("__init__", make_constructor (edgeFactory2 < stepEdge <weightedEdgeVirtual > > ));
-		class_< stepEdge < staticWeightedEdgeVirtual>, bases <edgeBlueprint>  >("step_staticWeightedEdge", reinterpret_cast<const char *>(__edges_step_staticWeightedEdge))
-					.def ("__init__", make_constructor (edgeFactory2 < stepEdge <staticWeightedEdgeVirtual > > ));
+		boost::python::class_< component < staticWeightedEdgeVirtual>, boost::python::bases <edgeBlueprint>  >("component_staticWeightedEdge" ,reinterpret_cast<const char *>(__edges_component_staticWeightedEdge))
+					.def ("__init__",boost::python::make_constructor (edgeFactory2 <component< staticWeightedEdgeVirtual > > ));
 
 
 
+		boost::python::class_< staticComponent < edgeVirtual > , boost::python::bases <edgeBlueprint> >("staticComponent", reinterpret_cast<const char *>(__edges_component))
+					.def ("__init__",boost::python::make_constructor (edgeFactory1 <staticComponent < edgeVirtual > > ));
 
-		class_<directedNetwork, bases <networkTemplate> >("directedNetwork");
+		boost::python::class_< staticComponent < weightedEdgeVirtual>, boost::python::bases <edgeBlueprint>   > ("staticComponent_weightedEdge" ,reinterpret_cast<const char *>(__edges_weightedEdge))
+					.def ("__init__",boost::python::make_constructor (edgeFactory2 <staticComponent < weightedEdgeVirtual> > ));
+		boost::python::class_< staticComponent < staticWeightedEdgeVirtual>, boost::python::bases <edgeBlueprint>  >("staticComponent_staticWeightedEdge" ,reinterpret_cast<const char *>(__edges_component_staticWeightedEdge))
+					.def ("__init__",boost::python::make_constructor (edgeFactory2 <staticComponent < staticWeightedEdgeVirtual> > ));
+
+
+		boost::python::class_< randomTarget < edgeVirtual>, boost::python::bases <edgeBlueprint>  > ("randomTarget",  reinterpret_cast<const char *>(__edges_randomTarget))
+					.def ("__init__",boost::python::make_constructor (edgeFactory2 < randomTarget < edgeVirtual>   > ));
+		boost::python::class_< randomTarget < weightedEdgeVirtual>, boost::python::bases <edgeBlueprint>  > ("randomTarget_weightedEdge",  reinterpret_cast<const char *>(__edges_weightedEdge))
+					.def ("__init__",boost::python::make_constructor (edgeFactory3 < randomTarget < weightedEdgeVirtual>   > ));
+		boost::python::class_< randomTarget < staticWeightedEdgeVirtual>, boost::python::bases <edgeBlueprint>  >("randomTarget_staticWeightedEdge", reinterpret_cast<const char *>(__edges_randomTarget_staticWeightedEdge))
+					.def ("__init__",boost::python::make_constructor (edgeFactory3 < randomTarget < staticWeightedEdgeVirtual>   > ));
+
+		boost::python::class_< stepEdge < edgeVirtual>, boost::python::bases <edgeBlueprint>  > ("step" ,reinterpret_cast<const char *>(__edges_stepEdge))
+					.def ("__init__",boost::python::make_constructor (edgeFactory1 < stepEdge <edgeVirtual > > ));
+		boost::python::class_< stepEdge < weightedEdgeVirtual>, boost::python::bases <edgeBlueprint>  > ("step_weightedEdge", reinterpret_cast<const char *>(__edges_weightedEdge))
+					.def ("__init__",boost::python::make_constructor (edgeFactory2 < stepEdge <weightedEdgeVirtual > > ));
+		boost::python::class_< stepEdge < staticWeightedEdgeVirtual>, boost::python::bases <edgeBlueprint>  >("step_staticWeightedEdge", reinterpret_cast<const char *>(__edges_step_staticWeightedEdge))
+					.def ("__init__",boost::python::make_constructor (edgeFactory2 < stepEdge <staticWeightedEdgeVirtual > > ));
+
+
+
+
+		boost::python::class_<directedNetwork, boost::python::bases <networkTemplate> >("directedNetwork");
 //				.def ("__init__");
 
 
-		class_<undirectedNetwork, bases <networkTemplate> >("undirectedNetwork");
+		boost::python::class_<undirectedNetwork, boost::python::bases <networkTemplate> >("undirectedNetwork");
 //				.def ("__init__");
 
 	}

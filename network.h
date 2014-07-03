@@ -8,7 +8,7 @@
 #include <set>
 #include <vector>
 
-using namespace boost;
+//using namespace boost;
 #include "gslNoise.h"
 
 #include "baseType.h"
@@ -92,7 +92,7 @@ namespace conedy
 			baseType linkStrength ( nodeDescriptor i, nodeDescriptor j );
 			
 			//! Randomizes the coupling strengths for all edges which connect nodes of kind sourcenNodeKind to nodes of kind targetNodeKind. New weights are drawn from r.
-			void randomizeWeights( function<baseType()> r, nodeBlueprint *n1 = stdNode, nodeBlueprint *n2 = stdNode);
+			void randomizeWeights( boost::function<baseType()> r, nodeBlueprint *n1 = stdNode, nodeBlueprint *n2 = stdNode);
 
 			//! replaces node nodeNumber with a newly created node constructed by n->construct() 
 			void replaceNode(nodeDescriptor nodeNumber, nodeBlueprint *n = stdNode);

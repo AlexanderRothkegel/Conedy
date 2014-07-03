@@ -15,7 +15,7 @@ using namespace std;
 
 
 #include "node.h"
-#define Getarget(type,pointer) (bind(&expression<type>::evaluate,(pointer)))
+#define Getarget(type,pointer) (boost::bind(&expression<type>::evaluate,(pointer)))
 
 
 

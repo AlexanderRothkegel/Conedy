@@ -44,9 +44,9 @@ namespace conedy
 			void addRandomEdgesUndirected ( double meanOutDegree, edgeBlueprint * l = stdEdge );
 			void addRandomEdgesDirected ( double meanOutDegree, edgeBlueprint * l = stdEdge );
 			
-			void addRandomEdgesDegreeDistribution ( function <double () > r, edgeBlueprint *l = stdEdge ) { directed ? addRandomEdgesDegreeDistributionDirected(r,l): addRandomEdgesDegreeDistributionUndirected(r,l); }
-			void addRandomEdgesDegreeDistributionUndirected ( function <double () > r, edgeBlueprint *l = stdEdge );
-			void addRandomEdgesDegreeDistributionDirected ( function <double () > r, edgeBlueprint *l = stdEdge );
+			void addRandomEdgesDegreeDistribution ( boost::function <double () > r, edgeBlueprint *l = stdEdge ) { directed ? addRandomEdgesDegreeDistributionDirected(r,l): addRandomEdgesDegreeDistributionUndirected(r,l); }
+			void addRandomEdgesDegreeDistributionUndirected ( boost::function <double () > r, edgeBlueprint *l = stdEdge );
+			void addRandomEdgesDegreeDistributionDirected ( boost::function <double () > r, edgeBlueprint *l = stdEdge );
 
 			//! ein Netzwerk aus x * y Knoten vom Typ n
 			nodeDescriptor beeWeb ( int x, int y, nodeBlueprint *n = stdNode, edgeBlueprint *l = stdEdge );

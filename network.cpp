@@ -412,7 +412,7 @@ unsigned int network::randomNode(nodeKind nodeKind)
 
 
 
-void network::randomizeWeights (function<baseType()> r, nodeBlueprint *n1 , nodeBlueprint *n2 )
+void network::randomizeWeights (boost::function<baseType()> r, nodeBlueprint *n1 , nodeBlueprint *n2 )
 
   {
 

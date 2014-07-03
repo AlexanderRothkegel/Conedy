@@ -48,13 +48,13 @@ namespace conedy
 	void dynNetwork::snapshotAtEventSignature ( nodeDescriptor eventSignature)
 	{
 
-		eventHandler::insertVisiterAtSignature(bind(&dynNetwork::snapshot,this),eventSignature);
+		eventHandler::insertVisiterAtSignature(boost::bind(&dynNetwork::snapshot,this),eventSignature);
 	}
 
 
 	void dynNetwork::snapshotAtEvent( nodeDescriptor eventNumber)
 	{
-		eventHandler::insertVisiter(bind(&dynNetwork::snapshot,this),eventNumber);
+		eventHandler::insertVisiter(boost::bind(&dynNetwork::snapshot,this),eventNumber);
 	}
 
 
@@ -167,7 +167,7 @@ namespace conedy
 		nodeList * vl = new nodeList();
 		verticesMatching(*vl, nt);
 		realign *r = new realign ( inputFilename, outputFilename, vl, epsilon, skip);
-		insertVisiter( bind(&realign::realignPeriodically, r), eventNumber);
+		insertVisiter( boost::bind(&realign::realignPeriodically, r), eventNumber);
 
 		//		insertVisiter( bind(&dynNetwork::snapshot, this), eventNumber);
 
@@ -181,7 +181,7 @@ namespace conedy
 		nodeList * vl = new nodeList();
 		verticesMatching(*vl, nt);
 		realign *r = new realign ( inputFilename, outputFilename, vl, epsilon, multi);
-		insertVisiter( bind(&realign::realignWhenDistant, r), eventNumber);
+		insertVisiter( boost::bind(&realign::realignWhenDistant, r), eventNumber);
 
 		//		insertVisiter( bind(&dynNetwork::snapshot, this), eventNumber);
 
@@ -195,15 +195,15 @@ namespace conedy
 		nodeList * vl = new nodeList();
 		verticesMatching(*vl, nt);
 		realign *r = new realign ( inputFilename, outputFilename, vl, epsilon, skip);
-		insertVisiterAtSignature( bind(&realign::realignPeriodically, r), eventNumber);
+		insertVisiterAtSignature( boost::bind(&realign::realignPeriodically, r), eventNumber);
 
 
 
 	}
 
-	void dynNetwork::randomizeStates ( nodeBlueprint *n, function<baseType () > a1, function<baseType () > a2 , function<baseType () > a3 , function<baseType () > a4 , function<baseType () > a5 , function<baseType () > a6 , function<baseType () > a7 , function<baseType () > a8 , function<baseType () > a9 , function<baseType () > a10 , function<baseType () > a11 , function<baseType () > a12)
+	void dynNetwork::randomizeStates ( nodeBlueprint *n, boost::function<baseType () > a1, boost::function<baseType () > a2 , boost::function<baseType () > a3 , boost::function<baseType () > a4 , boost::function<baseType () > a5 , boost::function<baseType () > a6 , boost::function<baseType () > a7 , boost::function<baseType () > a8 , boost::function<baseType () > a9 , boost::function<baseType () > a10 , boost::function<baseType () > a11 , boost::function<baseType () > a12)
 	{
-		vector <function<baseType () > > argList;
+		vector <boost::function<baseType () > > argList;
 		argList.push_back (a1);
 		if (a2 == NULL)
 		{
@@ -357,7 +357,7 @@ namespace conedy
 
 
 
-	void dynNetwork::randomizeParameter ( string s,function<baseType () > r )
+	void dynNetwork::randomizeParameter ( string s,boost::function<baseType () > r )
 	{
 		networkElementType n = params<baseType>::getNodeTypeFromString ( s );
 		nodeIterator it;
@@ -475,7 +475,7 @@ namespace conedy
 
 
 
-		boost::function<baseType () > r = bind ( &frontAndPop,&initialCond );
+		boost::function<baseType () > r = boost::bind ( &frontAndPop,&initialCond );
 
 
 		vector< node * >::iterator  it;
@@ -546,7 +546,7 @@ namespace conedy
 
 
 
-		boost::function<baseType () > r = bind ( &frontAndPop,&initialCond );
+		boost::function<baseType () > r = boost::bind ( &frontAndPop,&initialCond );
 
 
 		vector< node * >::iterator  it;
@@ -586,7 +586,7 @@ namespace conedy
 		nodeDescriptor streamOutNodeNumber = addStreamOutNode(fileName);
 		streamOutNode *s = dynamic_cast<streamOutNode*>( nodeBlueprint::theNodes[streamOutNodeNumber]);
 
-		eventHandler::insertVisiterAtSignature(bind(&streamOutNode::evolve,s, 0.0),eventNumber);
+		eventHandler::insertVisiterAtSignature(boost::bind(&streamOutNode::evolve,s, 0.0),eventNumber);
 		delete nod;
 
 		network::link( streamOutNodeNumber, timeNodeNumber);
@@ -603,7 +603,7 @@ namespace conedy
 		nodeDescriptor streamOutNodeNumber = addNode(nod);
 		streamOutNode *s = dynamic_cast<streamOutNode*>( nodeBlueprint::theNodes[streamOutNodeNumber]);
 
-		eventHandler::insertVisiterAtSignature(bind(&streamOutNode::evolve,s, 0.0),eventNumber);
+		eventHandler::insertVisiterAtSignature(boost::bind(&streamOutNode::evolve,s, 0.0),eventNumber);
 		delete nod;
 
 		network::link( streamOutNodeNumber, timeNodeNumber);
@@ -619,7 +619,7 @@ namespace conedy
 		nodeDescriptor streamOutNodeNumber = addNode(nod);
 		streamOutNode *s = dynamic_cast<streamOutNode*>( nodeBlueprint::theNodes[streamOutNodeNumber]);
 
-		eventHandler::insertVisiter(bind(&streamOutNode::evolve,s, 0.0),eventNumber);
+		eventHandler::insertVisiter(boost::bind(&streamOutNode::evolve,s, 0.0),eventNumber);
 		delete nod;
 
 		network::link( streamOutNodeNumber, timeNodeNumber);

@@ -6,7 +6,7 @@
 #include <boost/function.hpp>
 #include "dynNode.h"
 
-using namespace boost;
+// using namespace boost;
 
 
 template <typename T>
@@ -67,9 +67,9 @@ class randomVector : public command
 
 	public:
 		void push_back(bindExpression<T> *el) { vec.push_back(el); }
-		vector < function<T() > > evaluate()
+		vector < boost::function<T() > > evaluate()
 		{
-			vector<function <T()>  > resVec;
+			vector<boost::function <T()>  > resVec;
 			for (unsigned int i = 0; i < vec.size(); i++)
 				resVec.push_back((baseType)vec[i]->_f);
 			return resVec;

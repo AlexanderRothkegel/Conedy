@@ -269,7 +269,7 @@ class printInstructionDouble : public instruction
 
 
 
-#define _E(type,pointer) (bind(&expression<type>::evaluate,(pointer)))
+#define _E(type,pointer) (boost::bind(&expression<type>::evaluate,(pointer)))
 
 
 

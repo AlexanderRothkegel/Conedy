@@ -315,7 +315,7 @@ namespace conedy
 	{
 
 		dijkstraCompare dC;
-		relaxed_heap <nodeDescriptor, dijkstraCompare > theQueue (vl.size()+3, dC);
+		boost::relaxed_heap <nodeDescriptor, dijkstraCompare > theQueue (vl.size()+3, dC);
 		dC.weightMap.resize(vl.size());
 
 		unsigned int i;
@@ -440,7 +440,7 @@ namespace conedy
 		vector <double> sigma (vl.size());  // array sigma der Länge vl.size()
 
 		dijkstraCompare dC;
-		relaxed_heap < nodeDescriptor, dijkstraCompare > Q (vl.size()+3, dC); // queue Q
+		boost::relaxed_heap < nodeDescriptor, dijkstraCompare > Q (vl.size()+3, dC); // queue Q
 		dC.weightMap.resize(vl.size());
 
 		vector <double> delta (vl.size());// array delta der Länge vl.size()

@@ -512,7 +512,7 @@ void createNetwork::addRandomEdgesDirected ( double meanOutDeg, edgeBlueprint *l
 
 
 
-void createNetwork::addRandomEdgesDegreeDistributionUndirected ( function <double () > r , edgeBlueprint *l)
+void createNetwork::addRandomEdgesDegreeDistributionUndirected ( boost::function <double () > r , edgeBlueprint *l)
 {
 	nodeList vl;
 	verticesMatching (vl,_dynNode_);
@@ -554,7 +554,7 @@ void createNetwork::addRandomEdgesDegreeDistributionUndirected ( function <doubl
 }
 
 
-void createNetwork::addRandomEdgesDegreeDistributionDirected ( function <double () > r , edgeBlueprint *l)
+void createNetwork::addRandomEdgesDegreeDistributionDirected ( boost::function <double () > r , edgeBlueprint *l)
 {
 	nodeList vl;
 	verticesMatching (vl,_dynNode_);

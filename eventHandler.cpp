@@ -243,12 +243,12 @@ eventHandler::eventHandler ( )
 
 }
 
-void eventHandler::insertVisiter ( function <void() > v, unsigned int eventNumber )
+void eventHandler::insertVisiter ( boost::function <void() > v, unsigned int eventNumber )
 {
 	eventList[eventNumber].owner = new visiter ( v, eventList[eventNumber].owner );
 }
 
-void eventHandler::insertVisiterAtSignature( function <void()> v, unsigned int signature)
+void eventHandler::insertVisiterAtSignature( boost::function <void()> v, unsigned int signature)
 {
 	for (unsigned int i=0; i < eventList.size();i++)
 		if (eventList[i].signature == signature)

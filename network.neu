@@ -16,7 +16,7 @@
 // verschiedene Nodearten includieren
 
 #include <boost/bind.hpp>
-using namespace boost;
+//using namespace boost;
 #include "stream.h"
 
 #include "gslNoise.h"
@@ -39,7 +39,7 @@ const bool _undirected_ = 1;
 
 const int parallelEdges = 1 << 2;
 using namespace std;
-using namespace boost;
+//using namespace boost;
 
 
 namespace conedy

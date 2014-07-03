@@ -10,7 +10,7 @@
 #include <vector>
 //#include "node.h"
 #include <boost/function.hpp>
-using namespace boost;
+// using namespace boost;
 
 namespace conedy
 {
@@ -133,7 +133,7 @@ namespace conedy
 					return _undefinedNodeType_;
 				}
 
-				void randomizeParameter(string s, networkElementType n, function<double ()> r)   // require: Nodetype ist richtig ! 
+				void randomizeParameter(string s, networkElementType n, boost::function<double ()> r)   // require: Nodetype ist richtig ! 
 				{
 					unsigned int place = (unsigned int )adress[s].second;
 					if (isStandard())
@@ -162,7 +162,7 @@ namespace conedy
 					}
 				}
 
-				static void randomizeParameter( string parameterString, function<double ()> r)
+				static void randomizeParameter( string parameterString, boost::function<double ()> r)
 				{
 					randomizeParameter(parameterString, getNodeTypeFromString(parameterString), r);
 				}

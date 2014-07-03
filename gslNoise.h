@@ -27,7 +27,7 @@
 
 
 using namespace std;
-using namespace boost;
+// using namespace boost;
 //! Wrapper-klasse für die Zufallszahlen der GSL
 class gslNoise {
 	private:
@@ -105,11 +105,11 @@ class gslNoise {
 
 		// Funktions
 
-		static function<double () > functionUniform (double lower, double upper) { return bind(&gslNoise::getUniform, lower, upper); }
-		static function<double () > functionGaussian (double mean, double sigma) { return bind(&gslNoise::getGaussian, mean, sigma); }
-		static function<double () > functionConstant (double mean) { return bind(&gslNoise::getConstant, mean); }
-		static function<double () > functionBimodal (double lower, double upper, double prob) { return bind (&gslNoise::getBimodal, lower, upper, prob); }
-		static function<double () > functionPowerLaw (double exponent, double bound) {  return bind (&gslNoise::getPowerLaw, exponent, bound); }
+		static boost::function<double () > functionUniform (double lower, double upper) { return boost::bind(&gslNoise::getUniform, lower, upper); }
+		static boost::function<double () > functionGaussian (double mean, double sigma) { return boost::bind(&gslNoise::getGaussian, mean, sigma); }
+		static boost::function<double () > functionConstant (double mean) { return boost::bind(&gslNoise::getConstant, mean); }
+		static boost::function<double () > functionBimodal (double lower, double upper, double prob) { return boost::bind (&gslNoise::getBimodal, lower, upper, prob); }
+		static boost::function<double () > functionPowerLaw (double exponent, double bound) {  return boost::bind (&gslNoise::getPowerLaw, exponent, bound); }
 			
 			
 

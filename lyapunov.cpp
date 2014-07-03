@@ -159,7 +159,7 @@
 			states.push (n);
 			i++;
 		}
-		boost::function<baseType () > r =  bind(&frontAndPop, &states);
+		boost::function<baseType () > r =  boost::bind(&frontAndPop, &states);
 		for (vi = vl->begin(); vi != vl->end();vi++)
 		{
 			((dynNode*)  node::theNodes[*vi]) ->	randomizeState( r) ;

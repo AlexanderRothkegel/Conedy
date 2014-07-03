@@ -148,7 +148,7 @@ namespace conedy
 		class randomNode : public dynNode
 
 	{  
-		function<T () > r;
+		boost::function<T () > r;
 		public:
 
 		virtual const unsigned int dimension() const{ return 0;}

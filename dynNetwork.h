@@ -63,17 +63,17 @@ namespace conedy
 			void removeObserver ();
 
 			//! Sets random states for all nodes in the network which match the blueprint n. 
-			void randomizeStatesVec (nodeBlueprint *n, vector<function<baseType() > >r);
+			void randomizeStatesVec (nodeBlueprint *n, vector<boost::function<baseType() > >r);
 
 			//! Does the same as randomizeStatesVec. However, values are given seperately. Is used to generate function wrappers for the python interface in a simple way.
-			void randomizeStates ( nodeBlueprint *n, function<baseType () > a1, function<baseType () > a2 = NULL, function<baseType () > a3 = NULL, function<baseType () > a4 = NULL, function<baseType () > a5 = NULL, function<baseType () > a6 = NULL, function<baseType () > a7 = NULL, function<baseType () > a8 = NULL, function<baseType () > a9 = NULL, function<baseType () > a10 = NULL, function<baseType () > a11 = NULL, function<baseType () > a12 = NULL);
+			void randomizeStates ( nodeBlueprint *n, boost::function<baseType () > a1, boost::function<baseType () > a2 = NULL, boost::function<baseType () > a3 = NULL, boost::function<baseType () > a4 = NULL, boost::function<baseType () > a5 = NULL, boost::function<baseType () > a6 = NULL, boost::function<baseType () > a7 = NULL, boost::function<baseType () > a8 = NULL, boost::function<baseType () > a9 = NULL, boost::function<baseType () > a10 = NULL, boost::function<baseType () > a11 = NULL, boost::function<baseType () > a12 = NULL);
 
 			//! Set states of all nodes which match n. Values are read from a file with name fileName.
 			void readInitialCondition ( string fileName, nodeBlueprint * n );
 
 
 			//! Draw a random value for parameter s for each node in the network to which s belongs.
-			void randomizeParameter ( string s, function<baseType () > r );
+			void randomizeParameter ( string s, boost::function<baseType () > r );
 
 			void readParameter ( string,string );
 
@@ -93,10 +93,10 @@ namespace conedy
 
 			// inofficial functions (atm)
 
-			void noiseToStatesVec (nodeBlueprint *n,      vector<function<baseType() > >r);
+			void noiseToStatesVec (nodeBlueprint *n,      vector<boost::function<baseType() > >r);
 
 			//! Set states of all nodes which match n. Such that newstate = oldstate + r(). 
-			void noiseToStates ( function<baseType () > r, networkElementType n = _undefinedNodeType_ );
+			void noiseToStates ( boost::function<baseType () > r, networkElementType n = _undefinedNodeType_ );
 
 
 			//! obsolete ?

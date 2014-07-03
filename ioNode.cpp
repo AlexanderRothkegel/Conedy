@@ -191,12 +191,12 @@ namespace conedy
 
 			if ( getGlobal<bool> ("outputCompress") )
 			{
-				newOut->push ( gzip_compressor() );
+				newOut->push ( io::gzip_compressor() );
 				//				cout << "Schreibe Daten gepackt ..." << endl;
 			}
 			if ( getGlobal<bool> ("outputAppend") )
 			{
-				io::file_sink fs = file_sink( s.c_str(), ios_base::out | ios_base::app);
+				io::file_sink fs = io::file_sink( s.c_str(), ios_base::out | ios_base::app);
 				if (!fs.is_open())
 					throw "cannot open file for writing. ";
 				newOut->push ( fs );
@@ -204,8 +204,8 @@ namespace conedy
 			}
 			else
 			{
-				io::file_sink fs = file_sink( s.c_str(), ios_base::out);
-//				io::file_sink fs = file_sink("stupid", ios_base::out);
+				io::file_sink fs = io::file_sink( s.c_str(), ios_base::out);
+//				io::file_sink fs = io::file_sink("stupid", ios_base::out);
 
 				if (!fs.is_open())
 					throw "cannot open file for writing. ";
@@ -264,14 +264,14 @@ namespace conedy
 
 			if ( zipInput() )
 			{
-				newIn->push ( gzip_decompressor() );
+				newIn->push ( io::gzip_decompressor() );
 			}
 
-			io::file_source fs = file_source(s.c_str());
+			io::file_source fs = io::file_source(s.c_str());
 			if (!fs.is_open())
 				throw "cannot open file for reading. ";
 
-			newIn->push ( file_source ( s.c_str() ) );
+			newIn->push ( io::file_source ( s.c_str() ) );
 
 			in.push_back ( newIn );
 			streamNumber[s] = smallestUnusedNumber;

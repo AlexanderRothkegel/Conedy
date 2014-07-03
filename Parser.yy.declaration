@@ -21,7 +21,7 @@ instruction		: system
 	| dynNetworkCommand
    | spatialNetworkCommand
    | bluePrintCommand
-   | EXIT { $$ = new bindInstruction(bind(exit, 1)); }
+   | EXIT { $$ = new bindInstruction(boost::bind(exit, 1)); }
    | if
    | vectorFor ;
 
@@ -30,9 +30,9 @@ instruction		: system
 commandBlock	: '{' commands '}' { $$ = $2;};
 
 
-globalCommand:  SETRANDOMSEED '(' integer ')'  { $$ = new bindInstruction( bind(&gslNoise::setSeed,_E(int,$3))); }
-		|   ADDINPUTFILE '(' string ')' { $$ = new bindInstruction(bind(&command::addInputFile, _E(string,$3))); }
-		| CLEAR '(' ')' { $$ = new bindInstruction( bind(&command::clear)); }
+globalCommand:  SETRANDOMSEED '(' integer ')'  { $$ = new bindInstruction( boost::bind(&gslNoise::setSeed,_E(int,$3))); }
+		|   ADDINPUTFILE '(' string ')' { $$ = new bindInstruction(boost::bind(&command::addInputFile, _E(string,$3))); }
+		| CLEAR '(' ')' { $$ = new bindInstruction( boost::bind(&command::clear)); }
 		| SYSTEM '(' string ')' {
 #if CONDOR
 $$ = new emptyInstruction();
@@ -115,7 +115,7 @@ networkCommand	:
 		 NETWORK '.' ADDEDGE '(' nodeDescriptor ',' nodeDescriptor createLinkOptional ')'   { $$ = NETWORKFUNK3(addEdge,$1,_E(nodeDescriptor,$5),_E(nodeDescriptor,$7),_E(edgeBlueprint*,$8)); }
 		| NETWORK '.' ADDWEIGHTEDEDGE '(' nodeDescriptor ',' nodeDescriptor ',' baseType ')' { $$ = NETWORKFUNK3(addWeightedEdge,$1,_E(nodeDescriptor,$5),_E(nodeDescriptor,$7),_E(baseType,$9)); }
 		| NETWORK '.' CLEAR '(' ')' { $$ = NETWORKFUNK(clear,$1); }
-		| NETWORK '.' RANDOMIZEWEIGHTS '(' random ')' { function<baseType ()> r = bind(&expression<baseType>::evaluate,$5); $$ = new bindInstruction( bind(&networkTemplate::randomizeWeights, $1, r, network::stdNode, network::stdNode));}
+		| NETWORK '.' RANDOMIZEWEIGHTS '(' random ')' { boost::function<baseType ()> r = boost::bind(&expression<baseType>::evaluate,$5); $$ = new bindInstruction( boost::bind(&networkTemplate::randomizeWeights, $1, r, network::stdNode, network::stdNode));}
 		| NETWORK '.' REPLACENODE  '(' nodeDescriptor createNodeOptional ')' { $$ = NETWORKFUNK2(replaceNode,$1,_E(nodeDescriptor,$5), _E(nodeBlueprint*, $6)); }
 		| NETWORK '.' REMOVEEDGES '(' createLink ')' { $$ = NETWORKFUNK1 (removeEdges, $1, _E(edgeBlueprint*, $5)); }
 		| NETWORK '.' REMOVEEDGE '(' nodeDescriptor ',' nodeDescriptor ')' { $$ = NETWORKFUNK2 (removeEdge, $1, _E(nodeDescriptor, $5), _E(nodeDescriptor, $7)  ); }
@@ -142,7 +142,7 @@ networkCommandBaseType:
 createNetworkCommand :   
 	NETWORK '.' ADDRANDOMEDGES '(' baseType ',' createLink ')' { $$ = NETWORKFUNK2(addRandomEdges,$1,_E(baseType,$5), _E(edgeBlueprint*,$7)); }
 	| NETWORK '.' ADDRANDOMEDGESDEGREEDISTRIBUTION '(' random ',' createLink ')'
- {  function<baseType ()> r = bind(&expression<baseType>::evaluate,$5); $$ = NETWORKFUNK2(addRandomEdgesDegreeDistribution,$1,r, _E(edgeBlueprint*,$7)); }
+ {  boost::function<baseType ()> r = boost::bind(&expression<baseType>::evaluate,$5); $$ = NETWORKFUNK2(addRandomEdgesDegreeDistribution,$1,r, _E(edgeBlueprint*,$7)); }
 	| NETWORK '.' NORMALIZEINPUTS '(' baseType ')' { $$ = NETWORKFUNK1(normalizeInputs,$1,_E(baseType,$5)); }
 	| NETWORK '.' NORMALIZEOUTPUTS '(' baseType ')' { $$ = NETWORKFUNK1(normalizeOutputs,$1,_E(baseType,$5)); }
 	| NETWORK '.' REPLACEEDGES '(' baseType  createLinkOptional createNodeOptional ')' { $$ = NETWORKFUNK3(replaceEdges,$1,_E(baseType,$5), _E(edgeBlueprint*,$6), _E(nodeBlueprint*,$7)); }
@@ -231,10 +231,10 @@ dynNetworkCommand:
 		| NETWORK '.' RANDOMIZESTATES '(' createNode ',' randomList ')'{ $$ = NETWORKFUNK2(randomizeStatesVec, $1,  _E(nodeBlueprint*, $5),*$7 ); }
 
 | NETWORK '.' RANDOMIZEPARAMETER '(' string ',' random ')'
- { function<baseType ()> r = bind(&expression<baseType>::evaluate,$7);
+ { boost::function<baseType ()> r = boost::bind(&expression<baseType>::evaluate,$7);
 	 $$ = new bindInstruction(
-		bind(&networkTemplate::randomizeParameter,$1,
-	bind(&expression<string>::evaluate, $5), r)); }
+		boost::bind(&networkTemplate::randomizeParameter,$1,
+	boost::bind(&expression<string>::evaluate, $5), r)); }
 
 		| NETWORK '.' READINITIALCONDITION '(' createNode ',' inputFileName ')'  { $$ =	NETWORKFUNK2(readInitialCondition, $1,  _E(string,$7),  _E(nodeBlueprint *,$5) );}
 		| NETWORK '.' READPARAMS '(' string ',' inputFileName ')'
@@ -245,14 +245,14 @@ dynNetworkCommand:
 | NETWORK '.' STARTINGCONDITIONOPENWAVEENDING '(' ')' { $$ = NETWORKFUNK(startingConditionOpenWaveEnding,$1); }
 		| NETWORK '.' STARTINGCONDITIONOPENWAVEMIDDLE '(' ')' { $$ = NETWORKFUNK(startingConditionOpenWaveEndingMiddle,$1); }
 		| NETWORK '.' STARTINGCONDITIONSMALLDISTURBANCE '(' baseType ',' random ')'
-  { function<baseType ()> r = bind(&expression<baseType>::evaluate,$7);
+  { boost::function<baseType ()> r = boost::bind(&expression<baseType>::evaluate,$7);
 	 $$ = NETWORKFUNK2(smallDisturbance,$1,_E(baseType,$5), r); }
 
 | NETWORK '.' STARTINGCONDITIONSMALLDISTURBANCE '(' baseType ',' integer ',' integer ',' random ')'
-  { function<baseType ()> r = bind(&expression<baseType>::evaluate,$11);
+  { boost::function<baseType ()> r = boost::bind(&expression<baseType>::evaluate,$11);
 	 $$ = NETWORKFUNK4(smallDisturbance,$1,_E(baseType,$5), _E(int,$7), _E(int,$9), r); }
 | NETWORK '.' DYNAMICS '(' nodeDescriptor ')' { $$=NETWORKFUNK1(dynamics, $1, _E(nodeDescriptor, $5)); }
-| NETWORK '.' SETSTATE '(' nodeDescriptor ',' argList ')' {$$ = NETWORKFUNK2(setInitialConditionVec, $1, _E(nodeDescriptor, $5), bind(&expressionVector<baseType>::evaluate, $7)); };
+| NETWORK '.' SETSTATE '(' nodeDescriptor ',' argList ')' {$$ = NETWORKFUNK2(setInitialConditionVec, $1, _E(nodeDescriptor, $5), boost::bind(&expressionVector<baseType>::evaluate, $7)); };
 
 string :	STRING       {  std::string s(d_scanner.YYText()+1, strlen(d_scanner.YYText()) - 2); $$ =  new constantCommand<string>(s);}
 		 | string '+' integer	{ $$ = new stringCat<string,int>($1,$3); }
@@ -273,7 +273,7 @@ spatialNetworkCommand : NETWORK '.' USERANDOMPOSITIONING '(' ')'
 
 
 bluePrintCommand : createNode '=' createNode { $$ = new assignInstruction<nodeBlueprint*> ((varCommand<nodeBlueprint*>*)$1 ,$3);}
-					  | createNode '.' SETPARAMS '(' argList ')' { $$ = new bindInstruction( bind( &params<baseType>::setSheet , bind (&expression<nodeBlueprint*>::evaluate, $1), bind(&expressionVector<baseType>::evaluate, $5))); };
+					  | createNode '.' SETPARAMS '(' argList ')' { $$ = new bindInstruction( boost::bind( &params<baseType>::setSheet , boost::bind (&expression<nodeBlueprint*>::evaluate, $1), boost::bind(&expressionVector<baseType>::evaluate, $5))); };
 
 
 
@@ -363,27 +363,27 @@ link	:  DELAYLINK '(' integer ')' {edgeBlueprint *l = new delayEdge($3->evaluate
 
 
 random		: GAUSSIAN '(' baseType ',' baseType ')'
-		  { $$ = new bindExpression<baseType>(bind(&gslNoise::getGaussian ,bind(&expression<baseType>::evaluate, $3), bind(&expression<baseType>::evaluate, $5)));}
+		  { $$ = new bindExpression<baseType>(boost::bind(&gslNoise::getGaussian ,boost::bind(&expression<baseType>::evaluate, $3), boost::bind(&expression<baseType>::evaluate, $5)));}
 	| POWERLAW '(' baseType ',' baseType ')'
-	{ $$ = new bindExpression<baseType>(bind(&gslNoise::getPowerLaw,bind(&expression<baseType>::evaluate, $3), bind(&expression<baseType>::evaluate, $5)));}
+	{ $$ = new bindExpression<baseType>(boost::bind(&gslNoise::getPowerLaw,boost::bind(&expression<baseType>::evaluate, $3), boost::bind(&expression<baseType>::evaluate, $5)));}
 	| EXPONENTIAL '(' baseType ')'
-	{ $$ = new bindExpression<baseType>(bind(&gslNoise::getExponential,bind(&expression<baseType>::evaluate, $3)));}
+	{ $$ = new bindExpression<baseType>(boost::bind(&gslNoise::getExponential,boost::bind(&expression<baseType>::evaluate, $3)));}
 		| UNIFORM '(' baseType ',' baseType ')'
-  { $$ = new bindExpression<baseType>(bind(&gslNoise::getUniform,bind(&expression<baseType>::evaluate, $3), bind(&expression<baseType>::evaluate, $5)));}
+  { $$ = new bindExpression<baseType>(boost::bind(&gslNoise::getUniform,boost::bind(&expression<baseType>::evaluate, $3), boost::bind(&expression<baseType>::evaluate, $5)));}
 			| BIMODAL '(' baseType ',' baseType ',' baseType ')'
-  { $$ = new bindExpression<baseType>(bind(&gslNoise::getBimodal,		bind(&expression<baseType>::evaluate, $3),		bind(&expression<baseType>::evaluate, $5),		bind(&expression<baseType>::evaluate, $7))); }
+  { $$ = new bindExpression<baseType>(boost::bind(&gslNoise::getBimodal,		boost::bind(&expression<baseType>::evaluate, $3),		boost::bind(&expression<baseType>::evaluate, $5),		boost::bind(&expression<baseType>::evaluate, $7))); }
 		| POISSON '(' baseType ')'
-  { $$ = new bindExpression<baseType>(bind(gslNoise::getPoisson, bind(&expression<baseType>::evaluate, $3))); }
+  { $$ = new bindExpression<baseType>(boost::bind(gslNoise::getPoisson, boost::bind(&expression<baseType>::evaluate, $3))); }
 		| POISSON '(' baseType ',' baseType ')'
- { $$ = new bindExpression<baseType>(bind(gslNoise::getPoisson, bind(&expression<baseType>::evaluate, $3), _E(baseType,$5))); }
-		| CONSTANT '(' baseType ')' { $$ = new bindExpression<baseType>(bind(&expression<baseType>::evaluate, $3));   }
+ { $$ = new bindExpression<baseType>(boost::bind(gslNoise::getPoisson, boost::bind(&expression<baseType>::evaluate, $3), _E(baseType,$5))); }
+		| CONSTANT '(' baseType ')' { $$ = new bindExpression<baseType>(boost::bind(&expression<baseType>::evaluate, $3));   }
 
 
-//new bindExpression<baseType>(bind(&gslNoise::getGaussian, _E(baseType, $3), 0)); }
+//new bindExpression<baseType>(boost::bind(&gslNoise::getGaussian, _E(baseType, $3), 0)); }
 		| FROMFILE '(' string ')'
 	 {
 		ifstream *is = new ifstream ( $3->evaluate().c_str());
-	$$ = new bindExpression <baseType>(bind (&readDouble, is));
+	$$ = new bindExpression <baseType>(boost::bind (&readDouble, is));
 };
 
 
@@ -402,7 +402,7 @@ argList		: argList ',' baseType  { $1->push_back($3); }
 
 
 randomList	: randomList ',' random { $1->push_back(((bindExpression<baseType> *)$3) -> _f); }
-			  | random { $$ = new vector < function <baseType () > >(); $$ -> push_back(((bindExpression<baseType> *)$1)->_f ); };
+			  | random { $$ = new vector < boost::function <baseType () > >(); $$ -> push_back(((bindExpression<baseType> *)$1)->_f ); };
 
 
 integer		: INT { $$ = new constantCommand<int>(atoi(d_scanner.YYText())); }
@@ -415,7 +415,7 @@ integer		: INT { $$ = new constantCommand<int>(atoi(d_scanner.YYText())); }
 		| integer '%' integer { $$ = new modoloCommandint<int,int>($1,$3); }
 		| '(' INTTOKEN ')' baseType { $$ = new convertToInt($4); }
 		| '-'integer { $$ = new timesCommandint<int,int>(new constantCommand<int>(-1),$2); } %prec UMINUS
-		| GETRANDOMSEED '(' ')' { $$ = new bindExpression<int> (bind(&gslNoise::getSeed)); }
+		| GETRANDOMSEED '(' ')' { $$ = new bindExpression<int> (boost::bind(&gslNoise::getSeed)); }
 		| networkCommandInt
 		| statisticsNetworkCommandInt
 		| createNetworkCommandInt;

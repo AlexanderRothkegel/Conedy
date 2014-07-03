@@ -5,10 +5,18 @@
 
 #include <boost/python.hpp>
 
-using namespace boost::python;
 
 void revealNodesToPython ();
 
+// using namespace boost::python;
+
+template <class N>
+	 N* nodeFactory0 ()
+	{
+		N* res = new N();
+		vector <baseType> allParams;
+		res->rerouteParams(allParams);return res;
+	}
 
 template <class N>
 	 N* nodeFactory1 (double arg1)
