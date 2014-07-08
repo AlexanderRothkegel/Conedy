@@ -23,11 +23,13 @@ namespace conedy
 		vector< dynNode *>::iterator it;
 		for ( it= inOutNodeList.begin(); it != inOutNodeList.end(); ++it )
 			( *it )->evolve(0.0);
-		//				for ( it= inOutNodeList.begin(); it != inOutNodeList.end(); ++it )
-		//					( *it )->swap();
+
 		observationCounter++;
 
-		streamOutNode::enter();
+		vector <streamOutNode *>::iterator et;
+		for (et = enterList.begin(); et != enterList.end(); ++et)
+			(*et) -> enter();
+		
 
 		baseType verb = getGlobal<baseType>("progressVerbosity");
 		if ( ( verb != 0.0 ) && ( fmod(dynNode::time/( getGlobal<baseType> ("samplingTime") ), verb) < 0.9999 ) )
@@ -113,13 +115,8 @@ namespace conedy
 
 		eventHandler::registerCallBack ( _ioNode_, dynNode::time + getGlobal<baseType> ("samplingTime") );
 
-
 		observationCounter = 0;
-
-
 		dynNetwork::clean (  );
-
-
 
 		// call possible visiters which may be at the snapshot event
 		eventHandler::forceEvent (_ioNode_);

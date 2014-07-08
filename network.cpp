@@ -74,14 +74,18 @@ namespace conedy
 	{
 		evolveList.clear();
 		upkeepList.clear();
+		enterList.clear();
 
 		dynNode *nod;
 		nodeList vl;
 		nodeIterator it;
 		verticesMatching(vl,_dynNode_);
+
+
+
 		for (it = vl.begin(); it != vl.end(); it ++)
 		{
-
+				
 			nod = ( dynamic_cast<dynNode*>( node::theNodes[*it]));
 			nod->clean ( );
 			if ( nod->timeEvolution() )
@@ -90,6 +94,26 @@ namespace conedy
 				upkeepList.push_back (nod);
 
 		}
+
+
+		set <int> streamNumbers;
+		streamOutNode *sn;
+
+
+		nodeList vl2;
+		verticesMatching(vl2,_outNode_);
+
+		for (it =vl2.begin(); it != vl2.end(); ++it)
+		{
+			sn = dynamic_cast<streamOutNode*> (node::theNodes[*it]);	
+			if (sn && !streamNumbers.count(sn->localStreamNumber))
+			{
+				enterList.push_back(sn);
+				streamNumbers.insert(sn->localStreamNumber);
+			}
+
+		}
+
 
 	}
 
