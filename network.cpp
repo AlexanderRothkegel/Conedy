@@ -62,7 +62,7 @@ namespace conedy
 
 		edgesMatching(el, edgeType);
 		edgeIterator ei;
-		for (ei = el.begin(); ei != el.end(); ei++)
+		for (ei = el.begin(); ei != el.end(); ++ei)
 			remove(*ei);
 		clean(); // unsinnXXX todo
 

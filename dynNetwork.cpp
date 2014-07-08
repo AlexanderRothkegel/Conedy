@@ -21,9 +21,9 @@ namespace conedy
 	baseType dynNetwork::callBack ( unsigned int eventSignature )
 	{
 		vector< dynNode *>::iterator it;
-		for ( it= inOutNodeList.begin(); it != inOutNodeList.end(); it++ )
+		for ( it= inOutNodeList.begin(); it != inOutNodeList.end(); ++it )
 			( *it )->evolve(0.0);
-		//				for ( it= inOutNodeList.begin(); it != inOutNodeList.end(); it++ )
+		//				for ( it= inOutNodeList.begin(); it != inOutNodeList.end(); ++it )
 		//					( *it )->swap();
 		observationCounter++;
 
@@ -112,7 +112,6 @@ namespace conedy
 		dynNode::endTime = endTime;
 
 		eventHandler::registerCallBack ( _ioNode_, dynNode::time + getGlobal<baseType> ("samplingTime") );
-		//		eventHandler::registerCallBack ( _ioNode_, dynNode::time); // sdeNodes get a step of size 0 if this is used.
 
 
 		observationCounter = 0;
@@ -132,9 +131,9 @@ namespace conedy
 			if ( eventHandler::nextEvent() >= endTime )
 			{
 				timeTilEvent = endTime - dynNode::time;
-				for ( it = evolveList.begin(); it != evolveList.end(); it++ )
+				for ( it = evolveList.begin(); it != evolveList.end(); ++it)
 					( *it )->evolve ( timeTilEvent );
-				for (it = upkeepList.begin(); it != upkeepList.end();it++)
+				for (it = upkeepList.begin(); it != upkeepList.end();++it)
 					( *it) -> upkeep();
 
 				dynNode::time += timeTilEvent;
@@ -147,9 +146,9 @@ namespace conedy
 
 			if (timeTilEvent > -0.0)
 			{
-				for ( it = evolveList.begin(); it != evolveList.end(); it++ )
+				for ( it = evolveList.begin(); it != evolveList.end(); ++it )
 					( *it )->evolve ( timeTilEvent );
-				for (it = upkeepList.begin(); it != upkeepList.end();it++)
+				for (it = upkeepList.begin(); it != upkeepList.end();++it)
 					( *it) -> upkeep();
 				dynNode::time += timeTilEvent;
 			}
@@ -480,7 +479,7 @@ namespace conedy
 
 		vector< node * >::iterator  it;
 
-		for ( it = node::theNodes.begin(); it != node::theNodes.end(); it++ )
+		for ( it = node::theNodes.begin(); it != node::theNodes.end(); ++it )
 		{
 			//			if ( ( *it )->getNodeInfo().theNodeKind & _dynNode_ == 0 )
 			//				continue;
@@ -551,7 +550,7 @@ namespace conedy
 
 		vector< node * >::iterator  it;
 
-		for ( it = node::theNodes.begin(); it != node::theNodes.end(); it++ )
+		for ( it = node::theNodes.begin(); it != node::theNodes.end(); ++it )
 		{
 			//			if ( ( *it )->getNodeInfo().theNodeKind & _dynNode_ == 0 )
 			//				continue;
@@ -702,7 +701,7 @@ namespace conedy
 		network::nodeList vl;
 		network::verticesMatching ( vl, n);
 		network::nodeIterator it;
-		for ( it = vl.begin(); it != vl.end(); it++ )
+		for ( it = vl.begin(); it != vl.end(); ++it )
 			observe( *it,s, l);
 	}
 
