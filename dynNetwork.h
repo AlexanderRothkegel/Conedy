@@ -93,7 +93,7 @@ namespace conedy
 
 			// inofficial functions (atm)
 
-			void noiseToStatesVec (nodeBlueprint *n,      vector<boost::function<baseType() > >r);
+			void noiseToStatesVec (nodeBlueprint *n,      vector<boost::function<baseType()> >r);
 
 			//! Set states of all nodes which match n. Such that newstate = oldstate + r(). 
 			void noiseToStates ( boost::function<baseType () > r, networkElementType n = _undefinedNodeType_ );

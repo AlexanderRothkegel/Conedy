@@ -98,7 +98,7 @@ namespace conedy {
 		int i,j;
 
 		it = distVector.begin();
-		for ( ; it != distVector.end(); it++ )
+		for ( ; it != distVector.end(); ++it )
 		{
 			if ( it->first == it->second )
 			{
@@ -185,7 +185,7 @@ namespace conedy {
 		for ( i = 0; i < sizex; i++ )
 			for ( j = 0; j < sizey; j++ )
 			{
-				for (it = toAddForAllNodes.begin(); it != toAddForAllNodes.end(); it++)
+				for (it = toAddForAllNodes.begin(); it != toAddForAllNodes.end(); ++it)
 				{
 					targetX = it->first + i;
 					targetY = it->second + j;
@@ -359,11 +359,11 @@ void createNetwork::removeRandomEdgesUndirected ( double prop, edgeBlueprint * l
 	network::edgesMatching (allLinks, l->getEdgeInfo().theEdgeType);
 
 
-	for (it = allLinks.begin(); it != allLinks.end();it++)
+	for (it = allLinks.begin(); it != allLinks.end();++it)
 		if (getTarget(*it) > getSource(*it))
 			toChange.push_back(*it);
 
-	for ( it = toChange.begin(); it != toChange.end(); it++ )
+	for ( it = toChange.begin(); it != toChange.end(); ++it )
 	{
 
 		if ( network::noise.getUniform() > prop )
@@ -396,7 +396,7 @@ void createNetwork::removeRandomEdgesDirected ( double prop, edgeBlueprint * l)
 
 
 
-	for ( it = toChange.begin(); it != toChange.end(); it++ )
+	for ( it = toChange.begin(); it != toChange.end(); ++it )
 	{
 
 		if ( network::noise.getUniform() > prop )
@@ -523,7 +523,7 @@ void createNetwork::addRandomEdgesDegreeDistributionUndirected ( boost::function
 	unsigned int numberLinks;
 	double randomNumber;
 
-	for 	(it = vl.begin(); it != vl.end(); it++)
+	for 	(it = vl.begin(); it != vl.end(); ++it)
 	{
 		randomNumber = r();
 		if (randomNumber >= 0)
@@ -564,7 +564,7 @@ void createNetwork::addRandomEdgesDegreeDistributionDirected ( boost::function <
 
 	unsigned int numberLinks;
 
-	for 	(it = vl.begin(); it != vl.end(); it++)
+	for 	(it = vl.begin(); it != vl.end(); ++it)
 	{
 		numberLinks = r();
 		for (unsigned int i = 0; i < numberLinks ; i++)
@@ -690,7 +690,7 @@ void createNetwork::normalizeOutputs (baseType r)
 
 	unsigned int degree;
 
-	for (it = dynNodes.begin(); it != dynNodes.end(); it++)
+	for (it = dynNodes.begin(); it != dynNodes.end(); ++it)
 	{
 		degree =		nodeBlueprint::theNodes[*it]->degree();
 		for (unsigned int i = 0 ; i < nodeBlueprint::theNodes[*it]->degree(); i ++)
@@ -707,7 +707,7 @@ void createNetwork::normalizeInputs (baseType r)
 	nodeIterator it;
 	nodeList dynNodes;
 	verticesMatching(dynNodes, _dynNode_);
-	for (it = dynNodes.begin(); it != dynNodes.end(); it++)
+	for (it = dynNodes.begin(); it != dynNodes.end(); ++it)
 		nodeBlueprint::theNodes[*it]->normalizeInWeightSum(r);
 
 	network::clean();
@@ -819,7 +819,7 @@ void createNetwork::rewireTargetDirected ( double prop, nodeKind theNodeKind )
 
 	getRandomNode r (vl);
 
-	for ( it = toChange.begin() ; it != toChange.end(); it++ )
+	for ( it = toChange.begin() ; it != toChange.end(); ++it )
 		if (( network::noise.getUniform() <= prop ) )
 			nodeBlueprint::theNodes[it->first]->getEdge(it->second)->targetNumber = r();
 }
@@ -839,7 +839,7 @@ void createNetwork::rewireWeights ( double prop ,boost::function<double () > r,n
 	network::verticesMatching(vl, theNodeKind);
 	getRandomNode rn (vl);
 
-	for ( it = toChange.begin(); it != toChange.end(); it++ )
+	for ( it = toChange.begin(); it != toChange.end(); ++it )
 	{
 		if ( network::noise.getUniform() > prop )
 			continue;
@@ -887,7 +887,7 @@ void createNetwork::rewireDirected ( double prop, nodeBlueprint *n )
 
 
 
-	for ( it = toChange.begin(); it != toChange.end(); it++ )
+	for ( it = toChange.begin(); it != toChange.end(); ++it )
 	{
 		if ( network::noise.getUniform() > prop )
 			continue;
@@ -941,7 +941,7 @@ void createNetwork::replaceEdges ( double prop, edgeBlueprint * l, nodeBlueprint
 	getRandomNode r (vl);
 
 
-	for ( it = toChange.begin(); it != toChange.end(); it++ )
+	for ( it = toChange.begin(); it != toChange.end(); ++it )
 	{
 		if ( network::noise.getUniform() > prop )
 			continue;
@@ -989,12 +989,12 @@ void createNetwork::rewireUndirected ( double prop, nodeBlueprint * n ) // rewir
 	getRandomNode r (vl);
 
 
-	for (it = allLinks.begin(); it != allLinks.end();it++)
+	for (it = allLinks.begin(); it != allLinks.end();++it)
 		if (getTarget(*it) > getSource(*it))
 			toChange.push_back(*it);
 
 
-	for ( it = toChange.begin(); it != toChange.end(); it++ )
+	for ( it = toChange.begin(); it != toChange.end(); ++it )
 	{
 		if ( network::noise.getUniform() > prop )
 			continue;
@@ -1041,11 +1041,11 @@ void createNetwork::rewireTargetUndirected ( double prop, nodeKind theNodeKind )
 	getRandomNode r (vl);
 
 
-	for ( it = allLinks.begin(); it != allLinks.end(); it++)
+	for ( it = allLinks.begin(); it != allLinks.end(); ++it)
 		if ( getTarget (*it) > getSource (*it)  )
 			toChange.push_back(*it);
 
-	for (it = toChange.begin() ; it != toChange.end(); it++ )
+	for (it = toChange.begin() ; it != toChange.end(); ++it )
 	{
 		if (( network::noise.getUniform() <= prop ) )
 		{
@@ -1084,7 +1084,7 @@ void createNetwork::rewireSource ( double prop, nodeKind theNodeKind )
 	network::verticesMatching(vl, theNodeKind);
 	getRandomNode r (vl);
 
-	for ( it = toChange.begin(); it != toChange.end(); it++ )
+	for ( it = toChange.begin(); it != toChange.end(); ++it )
 	{
 		if ( network::noise.getUniform() > prop )
 			continue;
