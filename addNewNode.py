@@ -1,24 +1,3 @@
-#
-#    Conedy is a scientific tool which allows numerical integration of dynamical networks.
-#
-#    Copyright (C) 2011 Alexander Rothkegel, Henning Dickten, Ferdinand Stolz, Justus Schwabedahl
-#
-#    This file is part of conedy.
-#
-#    Conedy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>
-
-
 #!/usr/bin/python
 # -*- coding: utf8 -*-
 
@@ -62,110 +41,6 @@ class NodeEditor:
 	staticTargetNodeType = ""
 	fileNameOut = ""
 
-
-#	def __init__ (self):
-		
-
-	def readConsole(self,inName="", inDim=-1, type = "",   events = [],inNumParam=-1, params = [], dgl = [], doku = [], staticEdges = 0, staticEdgeType = "", staticTargetNodeType= "", inFileNameOut=""):
-
-		"Klasse zum Erstellen neues Nodes in Conedy"
-
-		self.events = events
-		self.params = params
-		self.doku = doku
-
-		# Klassenname einlesen
-		if (inName == ""):
-			temp = raw_input("Please enter new nodename: ")
-			print "\n"
-		else:
-			temp = inName
-	
-
-		self.className = temp
-		self.nodeInfo  = "_" + self.className + "_" 
-
-
-		# Integrator enlesen
-	
-		if (type == ""):
-			temp = raw_input("Please choose an nodeType (type) from the following list\n\todeNode, sde, stdOdeIntegrator, pco, pcoDelay , map: ")
-			print "\n"
-			self.type = temp
-		else:
-			self.type = type
-
-		# Dimension des Oszillators abfragen
-		while (inDim <= 0):
-			inDim = int(raw_input("Please enter dimension of oszillator ( >= 1 ): "))
-			print "\n"
-		self.dim		= inDim
-
-
-		# Anzahl der Parameter abfragen
-		while (inNumParam < 0):
-			inNumParam = int(raw_input("Please enter number of dynamic parameters: ( >= 0 ): "))
-			print "\n"
-		self.numParam	= inNumParam
-
-
-		# Parameter abfragen
-		
-		
-		if (static == 1):
-			self.static = 1
-			self.staticEdgeType = staticEdgeType
-			self.staticTargetNodeType = staticTargetNodeType
-
-
-		while  len(self.params) < self.numParam:
-			self.addNewParam(len(self.params)+1)
-			print "\n"
-
-		# DGL abfragen
-		if (dgl == []):
-			underline("Dynamic of %s dim. oszillator:" % self.dim)
-			print "\n"
-			
-			print "AVAILABLE FUNCTIONS:\n"
-			for f in self.functions:
-				print f
-			print "\n"
-	
-			print "AVAILABLE PARAMETERS:\n"
-			for p in self.params:
-				print p[0] + "()\t",
-			print "\n\n"
-	
-			if (len(self.params) > 0):
-				print "EXAMPLE: dxdt[0] = %s()*x[0] + x[1]**2 + CS - WS*x[0]\n\n" % self.params[0][0]
-			else:
-				print "EXAMPLE: dxdt[0] = 1/2*x[0] + x[1]**2 + CS - WS*x[0]\n\n"
-	
-			
-	
-			if self.type == "stdOdeIntegrator":
-				for d in range(self.dim):
-					temp = "dxdt[" + str(d) + "] = "
-					self.dgl.append(temp + raw_input(temp))
-			elif self.type =="mapNode":
-				for d in range(self.dim):
-					temp = "xprime[" + str(d) + "] = "
-					self.dgl.append(temp + raw_input(temp))
-			else:
-				raise Exception('spam', 'eggs')
-		else:
-			self.dgl = dgl
-
-		# Rest der Eingabe ist Doku
-
-		if (self.doku == []):
-			temp = raw_input("Doku:")
-			self.doku.append(temp)
-			while temp != "":
-				temp = raw_input("Doku:") # TODO hier waere es viel sinnvoller auf EOF zu ueberpruefen. Leider weiss ich grad nicht, wie das geht.
-				self.doku.append(temp)
-	
 
 
 	def addNewParam(self, pNum):
@@ -513,13 +388,6 @@ class NodeEditor:
 		#
 		# generatedNodes.cpp
 		#
-
-
-
-
-		#
-		# generatedNodes.cpp
-		#
 		fout = open ("generatedNodes.cpp", 'a')
 		fout.write	("#include \"generated%s.cpp\"\n" % self.className)
 		fout.close()
@@ -528,6 +396,7 @@ class NodeEditor:
 		#
 		# generatedRegisterStandards.h
 		#
+
 		fout = open ("generatedRegisterStandards.h", 'a')
 		fout.write("%s::registerStandardValues();\n" % self.className)
 		fout.close()
@@ -720,14 +589,6 @@ else:
 		for i in  range (1,config.getint(className, 'parameter')+ 1):
 			n.params.append( (config.get(className, 'parametername' + str(i)) , config.getfloat(className, 'defaultvalue' + str(i))) )
 
-
-
-#staticEdges = 1 is not really needed
-
-#		try:
-#				n.static = config.getboolean(className, 'staticEdges')
-#		except:
-#				n.static = 0
 
 		try:
 				n.staticEdgeType = config.get(className, 'staticEdgeType')

@@ -46,7 +46,7 @@ namespace conedy
 		networkElementType theNodeType;
 		// a bit mask for booleans which specify the kind of the node. inNode | outNode | dynNode
 		nodeKind  theNodeKind;
-		// the node name. Printey by printNodeStatistics 
+		// the node name. Printed by printNodeStatistics 
 		string theNodeName;
 	};
 

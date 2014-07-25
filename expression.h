@@ -112,7 +112,6 @@ class fileNameExpression : public expression <string>
 
 
 
-//! TODO hier ist irgendwas faul. Der bison macht da eventuell unendlich lange Bäume, wenn int und double ineinander umwandelbar sind.
 class convertToInt : public expression <int>
 {
 	private:
@@ -123,7 +122,6 @@ class convertToInt : public expression <int>
 };
 
 
-//! TODO hier ist irgendwas faul. Der bison macht da eventuell unendlich lange Bäume, wenn int und double ineinander umwandelbar sind.
 class convertIntegerToBaseType : public expression <baseType>
 {
 	private:

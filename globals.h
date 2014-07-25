@@ -35,10 +35,6 @@ template<> struct typeInteger<long double> { enum { result = 5 }; };
 
 
 
-// Maps of Types to ints for identification and to strings for error texts.
-
-//template <class T> int typeInteger(T);
-// template <class T> int typeInteger(T) {return -1;};
 
 
 class globals

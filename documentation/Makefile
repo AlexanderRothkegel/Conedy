@@ -16,6 +16,7 @@ ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
 
 all: html #latex 
+#	make -C _build/latex all-pdf
 	
 
 #Conedy.pdf: latex
