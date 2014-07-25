@@ -2,7 +2,6 @@
 #define integrator_h integrator_h
 
 
-
 #include "baseType.h"
 #include "gslNoise.h"
 
@@ -10,9 +9,10 @@ using namespace std;
 
 
 #ifndef M_PI
-#define M_PI    3.14159265358979323846f
+	#define M_PI    3.14159265358979323846f
 #endif
 
+#define FRAC(x,y) (((baseType) x)/((baseType) y))
 
 class odeIntegrator
 {
@@ -104,11 +104,11 @@ class rk4 : public odeIntegrator
 			func.dgl(state,dxdt);
 			
 			for (unsigned int i = 0; i < size; i++)
-				intermediateState[i] = state[i] + dt * dxdt[i] / 2.0;
+				intermediateState[i] = state[i] + dt * dxdt[i] * 0.5;
 			func.dgl(intermediateState,dxdt2);
 			
 			for (unsigned int i = 0; i < size; i++)
-				intermediateState[i] = state[i] + dt * dxdt2[i] / 2.0;
+				intermediateState[i] = state[i] + dt * dxdt2[i] * 0.5;
 			func.dgl(intermediateState,dxdt3);
 			
 			for (unsigned int i = 0; i < size; i++)
@@ -116,7 +116,7 @@ class rk4 : public odeIntegrator
 			func.dgl(intermediateState,dxdt4);
 
 			for (unsigned int i = 0; i < size; i++)
-				state[i] += dt * ( dxdt[i] + 2.0*dxdt2[i] + 2.0*dxdt3[i] + dxdt4[i] ) / 6.0;
+				state[i] += dt * ( dxdt[i] + 2*dxdt2[i] + 2*dxdt3[i] + dxdt4[i] ) * FRAC(1,6);
 		}
 };
 
@@ -172,45 +172,45 @@ class rkf45 : public odeIntegrator
 				
 				for (unsigned int i = 0; i < size; i++)
 					intermediateState[i] = state[i]
-								+ dt * dxdt[i] / 4.0;
+								+ dt * dxdt[i] * (1./4.);
 				func.dgl(intermediateState,dxdt2);
 				
 				for (unsigned int i = 0; i < size; i++)
 					intermediateState[i] = state[i] + dt * (
-								  dxdt [i] * 3
-								+ dxdt2[i] * 9) / 32.0;
+								  dxdt [i] * FRAC(3,32)
+								+ dxdt2[i] * FRAC(9,32));
 				func.dgl(intermediateState,dxdt3);
 				
 				for (unsigned int i = 0; i < size; i++)
 					intermediateState[i] = state[i] + dt * (
-								  dxdt [i] * 1932
-								- dxdt2[i] * 7200
-								+ dxdt3[i] * 7296) / 2197.0;
+								  dxdt [i] * FRAC(1932,2197)
+								- dxdt2[i] * FRAC(7200,2197)
+								+ dxdt3[i] * FRAC(7296,2197)) ;
 				func.dgl(intermediateState,dxdt4);
 				
 				for (unsigned int i = 0; i < size; i++)
 					intermediateState[i] = state[i] + dt *(
-								  dxdt [i] * 439 / 216.0
+								  dxdt [i] * FRAC(439,216)
 								- dxdt2[i] * 8
-								+ dxdt3[i] * 3680 / 513.
-								- dxdt4[i] * 845 / 4104.0);
+								+ dxdt3[i] * FRAC(3680,513)
+								- dxdt4[i] * FRAC(845,4104));
 				func.dgl(intermediateState,dxdt5);
 				
 				for (unsigned int i = 0; i < size; i++)
 					intermediateState[i] = state[i] + dt *(
-								- dxdt [i] * 8 / 27.
+								- dxdt [i] * FRAC(8,27)
 								+ dxdt2[i] * 2
-								- dxdt3[i] * 3544 / 2565.
-								+ dxdt4[i] * 1859 / 4104.
-								- dxdt5[i] * 11 / 40.);
+								- dxdt3[i] * FRAC(3544,2565)
+								+ dxdt4[i] * FRAC(1859,4104)
+								- dxdt5[i] * FRAC(11,40));
 				func.dgl(intermediateState,dxdt6);
 				
 				for (unsigned int i = 0; i < size; i++)
-				dy[i] = dt * (
-								  dxdt [i] * 25 / 216.
-								+ dxdt3[i] * 1408 / 2565.
-								+ dxdt4[i] * 2197 / 4104.
-								- dxdt5[i] * 1 / 5.);
+					dy[i] = dt * (
+								  dxdt [i] * FRAC(25,216)
+								+ dxdt3[i] * FRAC(1408,2565)
+								+ dxdt4[i] * FRAC(2197,4104)
+								- dxdt5[i] * FRAC(1,5));
 				
 				
 				if (adaptive)
@@ -220,11 +220,11 @@ class rkf45 : public odeIntegrator
 					for (unsigned int i = 0; i < size; i++)
 					{
 						errorrel = fabs((dy[i] - dt * (
-											  dxdt [i] * 16 / 135.
-											+ dxdt3[i] * 6656 / 12825.
-											+ dxdt4[i] * 28561 / 56430.
-											- dxdt5[i] * 9 / 50.
-											+ dxdt6[i] * 2 / 55.)
+											  dxdt [i] * FRAC(16,135)
+											+ dxdt3[i] * FRAC(6656,12825)
+											+ dxdt4[i] * FRAC(28561,56430)
+											- dxdt5[i] * FRAC(9,50)
+											+ dxdt6[i] * FRAC(2,55))
 											)/(absError + relError * (state[i]+dy[i])));
 						
 						if (errorrel > maxerrorrel)
@@ -369,7 +369,7 @@ class strongTaylor : public sdeIntegrator
 
 			//second step
 
-			func.dgl			(tmp2, dyt, dydW);
+			func.dgl(tmp2, dyt, dydW);
 			for (unsigned int i = 0; i < size; i++)	                                    
 				tmp2[i] = state[i] + dxdt[i]*dt - dydW[i]*sqdt;                        
 

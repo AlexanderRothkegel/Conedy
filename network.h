@@ -16,7 +16,7 @@ using namespace boost;
 
 #include <queue>
 
-
+#include "ioNode.h"
 
 const bool _directed_ = 1;
 const bool _undirected_ = 1;
@@ -257,6 +257,9 @@ namespace conedy
 
 			//! Contains all nodes which receive a callback after each intergration step
 			vector < dynNode *> upkeepList;
+		
+			vector < streamOutNode *> enterList;
+
 
 			unsigned int numberOfNodes;
 

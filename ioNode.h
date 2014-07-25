@@ -1,3 +1,5 @@
+#ifndef ioNode_h
+#define ioNode_h ioNode_h
 
 #define BOOST_IOSTREAMS_UNREACHABLE_RETURN(x)   return x;
 
@@ -6,8 +8,6 @@
 #define M_PI    3.14159265358979323846f
 #endif
 
-#ifndef ioNode_h
-#define ioNode_h ioNode_h
 
 #include "node.h"
 //#include "analData.h"
@@ -118,7 +118,7 @@ namespace conedy
 
 		public:
 
-			static void enter();
+			void enter();
 
 			//! Ausgabenodes brauchen keinen Aufruf von evolve, und somit gibt timeEvolution 0 zurück.
 			virtual bool timeEvolution () { return 0; }
@@ -138,7 +138,7 @@ namespace conedy
 			virtual ~streamOutNode();
 			virtual void evolve(baseType time) ;
 			virtual node *construct()
-			{ cout << "I am here" << endl;
+			{ 
 				if (getGlobal<bool>("inputCompress"))
 				{
 					streamOutNodeBinary * blueprint = new streamOutNodeBinary(stringOfStreamNumber[localStreamNumber]);

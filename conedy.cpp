@@ -30,15 +30,17 @@ void printDefines ()
 #endif
 
 
-	//#if DOUBLE
-	//	cout << "DOUBLE ";
-	//#endif
-
-
 #if LDOUBLE
 	cout << "LDOUBLE ";
+#elif DOUBLE
+	cout << "DOUBLE ";
+#elif FLOAT
+	cout << "FLOAT ";
 #endif
 
+#if NOGSL
+	cout << "NOGSL ";
+#endif
 
 #if CALENDARQUEUE
 	cout << "CALENDARQUEUE ";

@@ -153,9 +153,8 @@ namespace conedy
 
 
 	void streamOutNode::enter() {
-		for (unsigned int i = 0; i < out.size(); i++)
-			if (out[i] != NULL)
-				*out [i] << std::endl;
+//			if (out[i] != NULL)
+				*out [localStreamNumber] << std::endl;
 	}
 
 	streamOutNode::~streamOutNode()

@@ -92,7 +92,6 @@ namespace conedy
 
 
 			// inofficial functions (atm)
-
 			void noiseToStatesVec (nodeBlueprint *n,      vector<function<baseType() > >r);
 
 			//! Set states of all nodes which match n. Such that newstate = oldstate + r(). 
