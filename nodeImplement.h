@@ -230,7 +230,7 @@ namespace conedy {
 			edgeIterator it, end;
 			it =  outEdges.begin();
 			end = outEdges.end();
-			for ( ;it!=end; it++ )
+			for ( ;it!=end; ++it )
 				re = re + (*it)->getWeight() *  (*it)->getTargetState();
 			return re;
 		}
@@ -676,7 +676,7 @@ baseType nodeTemplateEdges<EDGE,EDGEVIRTUAL, DYNNODE>::linkStrength ( nodeDescri
 
 
 
-	template <typename EDGE, typename EDGEVIRTUAL, typename DYNNODE>
+template <typename EDGE, typename EDGEVIRTUAL, typename DYNNODE>
 baseType nodeTemplateEdges<EDGE,EDGEVIRTUAL, DYNNODE>::couplingSum()
 {
 	baseType re = 0;
@@ -684,7 +684,7 @@ baseType nodeTemplateEdges<EDGE,EDGEVIRTUAL, DYNNODE>::couplingSum()
 	edgeIterator it, end;
 	it =  outEdges.begin();
 	end = outEdges.end();
-	for ( ;it!=end; it++ )
+	for ( ;it!=end; ++it )
 		re = re +  it->getWeight()* it->getTargetState();
 	return re;
 }

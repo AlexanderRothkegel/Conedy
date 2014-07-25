@@ -2,18 +2,17 @@
 #define pulseCoupledPhaseOscillator_h pulseCoupledPhaseOscillator_h
 
 #include <math.h>
+#include <limits.h>
+#include <boost/function.hpp>
+#include <iomanip>
+
 #include "node.h"
 #include "params.h"
-#include <boost/function.hpp>
-
-//#include <gsl/gsl_odeiv.h>
 #include "dynNode.h"
-#include <limits.h>
 #include "baseType.h"
 #include "eventHandler.h"
 
 #include "dynNode.h"
-#include <iomanip>
 
 #define __MAXNUMBEROFIFNEURONS
 

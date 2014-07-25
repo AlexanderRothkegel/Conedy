@@ -33,7 +33,6 @@ namespace conedy
 	class dynNode : public node, public params<baseType>
 
 	{
-		//! Zeiger auf Speicherplatz für die
 		protected:
 		public:
 
@@ -59,7 +58,7 @@ namespace conedy
 
 			virtual void evolve(baseType time) { cerr << this->getNodeInfo().theNodeName << endl; throw "evolve of dynNode called";}
 			virtual bool timeEvolution () { return 0; };
-			virtual bool requiresUpkeep() { return 0;};
+			virtual bool requiresUpkeep() { return 0; };
 			virtual const unsigned int dimension () const { return 0; }
 
 			virtual baseType getHiddenComponent ( int component ) {return x[component];}

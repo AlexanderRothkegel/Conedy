@@ -28,7 +28,6 @@ using namespace std;
 // using namespace boost;
 using namespace boost::iostreams;
 
-// TODO: Fehlermeldung, wenn Datei nicht geöffnet werden kann. (Wegen Verzeichnis oder so)
 
 
 #include <iostream>
