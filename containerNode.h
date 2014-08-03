@@ -56,7 +56,7 @@ namespace conedy
 
 
 		public:
-			unsigned int startPosGslOdeNodeArray;
+			unsigned int startPosInContainerNodeArray GslOdeNodeArray;
 
 			virtual baseType getState (unsigned int component) { return dynamicVariablesOfAllDynNodes[ startPosGslOdeNodeArray + component ]; }
 
