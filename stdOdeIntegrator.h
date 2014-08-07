@@ -60,7 +60,6 @@ namespace conedy {
 		}
 
 
-//		virtual void swap(short i) { state=x[i]; }
 		virtual void clean()
 		{
 			if (amIFirst())

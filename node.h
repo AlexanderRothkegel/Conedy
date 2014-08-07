@@ -116,6 +116,8 @@ namespace conedy
 			virtual void getParameter(vector < baseType > &parameter)  { }
 			virtual nodeDescriptor getTarget() { return targetNumber;}
 			virtual const edgeInfo getEdgeInfo() {edgeInfo ei = {_edgeVirtual_,0, "edgeVirtual"}; return ei;}
+			virtual ostream& printStatistics ( ostream &os, int edgeOptVerbosity, int theEdgeKind, string theEdgeName, baseType weight);
+			virtual ostream& printStatistics ( ostream &os, int edgeOptVerbosity);
 			virtual edgeVirtual *construct() { return new edgeVirtual ( *this ); };
 			virtual ~edgeVirtual() {}
 			virtual baseType getWeight() { return (baseType)1; }
