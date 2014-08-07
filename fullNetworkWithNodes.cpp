@@ -2,12 +2,15 @@
 
 #include "fullNetworkWithNodes.h"
 
+using namespace conedy;
+
+
 void registerStandards()
 {
 
 	stdSdeIntegrator::registerStandardValues();
 	pcoBase::registerStandardValues();
-	containerNode<baseType, 0>::registerStandardValues();
+//	containerNode<baseType, 0>::registerStandardValues();
 	dynNetwork::registerStandardValues();
 //	createNetwork::registerStandardValues();
 	escapeNoiseNeuron::registerStandardValues();
@@ -26,7 +29,7 @@ void registerStandards()
 	streamInNode::registerStandardValues();
 	streamOutNode::registerStandardValues();
 	streamOutNodeHist::registerStandardValues();
-	sdeNode::registerStandardValues();
+//sdeNode::registerStandardValues();
 #if OPENGL
 	GLNetwork<baseType>::registerStandardValues();
 #endif

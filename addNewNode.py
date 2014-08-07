@@ -79,6 +79,7 @@ class NodeEditor:
 		fout.write("#ifndef %s_h\n#define %s_h %s_h\n\n#include <math.h>\n\n" % (fileNameOut, fileNameOut, fileNameOut))
 		fout.write("#include \"baseType.h\"\n")
 		fout.write("#include \"sdeNode.h\"\n")
+		fout.write("#include \"nodeImplement.h\"\n")
 		fout.write("#include <boost/function.hpp>\n\n")
 
 
@@ -119,7 +120,30 @@ class NodeEditor:
 
 
 		# Klasse erstellen
-		fout.write("class %s : public %s" %( self.className, self.type))
+
+#		if self.static == 0:
+#			fout.write("class_< nodeVirtualEdges<%s> , bases<nodeBlueprint> > (\"%s\",  reinterpret_cast<const char *>(__addedNodes_%s_%s) ) // added by addNewNodes.py \n" %(self.className, fileNameOut, self.type,self.className))
+#			fout.write(". def (\"__init__\", make_constructor (nodeFactory%i < nodeVirtualEdges <%s> > )); // added by addNewNodes.py\n"  % (len(self.params), self.className))   #adding constructor with different parameters
+			
+                if self.static == 0:
+                    parent = "nodeVirtualEdges <%s>" % self.type
+
+		elif self.static == 1:	
+		    self.staticEdgeType = self.staticEdgeType.replace ("_","<")
+		    hierachy = self.staticEdgeType.count ("<")
+		    self.staticEdgeType += ("<")
+		    self.staticEdgeBlueprint = self.staticEdgeType + (" edgeVirtual") 
+		    self.staticEdgeType = self.staticEdgeType + (" edge")
+
+                
+		    for i in range (0, hierachy):
+		    	self.staticEdgeType += (">")
+		    	self.staticEdgeBlueprint += (">")                      
+                    parent = "nodeTemplateEdges <%s> , %s> , %s > " %(self.staticEdgeType, self.staticEdgeBlueprint, self.type)
+
+
+                fout.write("class %s : public %s" %( self.className, parent))
+                    
 
 		if (len (self.events) > 0):   # derive from eventHandler if events are specified
 			fout.write(", public eventHandler\n")
@@ -144,6 +168,7 @@ class NodeEditor:
 
 		fout.write("\tpublic:\n")
 
+                fout.write ("\t\t virtual node* construct () { return new %s (*this); }" %(self.className))
 
 		if (self.period != ""):
 			dyn = self.period       #replace all parameter by the inline functions 
@@ -180,7 +205,7 @@ class NodeEditor:
 			fout.write("\t %s ( const %s &b); " %(self.className, self.className))
 
 		fout.write("\t\t//! Konstruktor ohne Parameter\n")
-		fout.write("\t\t%s() : %s(%s, %i) {}\n" % (self.className, self.type, self.nodeInfo, self.dim) )
+		fout.write("\t\t%s() : %s(%s, %i) {}\n" % (self.className, parent, self.nodeInfo, self.dim) )
 		fout.write("\t\t\n")
 
 		fout.write("\t\t//! Liefert die Dimension der Node zurueck\n")
@@ -190,7 +215,7 @@ class NodeEditor:
 
 		if self.type == "stdOdeIntegrator":
 			fout.write("\t\t//! Interface for ODE \n")
-			fout.write("\t\tvirtual void operator() (const baseType  x[], baseType  dydx[]);\n")
+			fout.write("\t\tvirtual void dgl  (const baseType  x[], baseType  dydx[]);\n")
 			fout.write("\t\t\n")
 		elif self.type =="pco":
 			fout.write("\t\t//! Interface for pco\n") 
@@ -202,15 +227,15 @@ class NodeEditor:
 			fout.write("\t\t\n")
 		elif self.type =="mapNode":
 			fout.write("\t\t//! Interface for mapNode\n")
-			fout.write("\t\tvirtual void operator() (baseType xprime [], baseType x[]);\n")
+			fout.write("\t\tvirtual void map (baseType xprime [], baseType x[]);\n")
 			fout.write("\t\t\n")
 		elif self.type =="sde":
 			fout.write("\t\t//! Interface for SDE\n")
-			fout.write("virtual void operator()(baseType x[], baseType  dxdt[], baseType s[], baseType dsdx[]);\n")
+			fout.write("virtual void sdgl (baseType x[], baseType  dxdt[], baseType s[], baseType dsdx[]);\n")
 			fout.write("\t\t\n")
 		elif self.type == "ode":
 			fout.write("\t\t//! Interface for ODE \n")
-			fout.write("\t\tvirtual void operator() (const baseType  x[], baseType  dydx[]);\n")
+			fout.write("\t\tvirtual void dgl (const baseType  x[], baseType  dydx[]);\n")
 			fout.write("\t\t\n")
 		else:
 			raise Exception('unknown type')
@@ -289,7 +314,7 @@ class NodeEditor:
 
 		if self.type == "stdOdeIntegrator":
 			fout.write("\t//! DGL von %s\n" % self.className)
-			fout.write("\tvoid %s::operator()(const baseType x[], baseType dxdt[]) \n" % self.className)
+			fout.write("\tvoid %s::dgl(const baseType x[], baseType dxdt[]) \n" % self.className)
 
 			fout.write("\t{\n")
 			fout.write(self.dgl)
@@ -297,7 +322,7 @@ class NodeEditor:
 			fout.write("\n")
 		elif self.type == "sde":
 			fout.write("\t//! DGL von %s\n" % self.className)
-			fout.write("\t void %s::operator()(baseType x[], baseType  dxdt[], baseType s[], baseType dsdx[]) \n" %self.className)	
+			fout.write("\t void %s::sdgl(baseType x[], baseType  dxdt[], baseType s[], baseType dsdx[]) \n" %self.className)	
 			fout.write("\t{\n")
 			fout.write(self.dgl)
 			fout.write("\t}\n")
@@ -322,14 +347,14 @@ class NodeEditor:
 			fout.write("\n")
 		elif self.type =="mapNode":
 			fout.write("\t//! Map von %s\n" % self.className)
-			fout.write("\tvoid %s::operator()(baseType xprime[], baseType x[]) \n" % self.className)
+			fout.write("\tvoid %s::map(baseType xprime[], baseType x[]) \n" % self.className)
 			fout.write("\t{\n")
 			fout.write(self.dgl)
 			fout.write("\t}\n")
 			fout.write("\n")
 		elif self.type == "ode":
 			fout.write("\t//! DGL von %s\n" % self.className)
-			fout.write("\tvoid %s::operator()(const baseType x[], baseType dxdt[]) \n" % self.className)
+			fout.write("\tvoid %s::dgl(const baseType x[], baseType dxdt[]) \n" % self.className)
 			fout.write("\t{\n")
 			fout.write(self.dgl)
 			fout.write("\t}\n")
@@ -416,23 +441,9 @@ class NodeEditor:
 
 		fout = open ("generatedNeuroPython.cpp", 'a')
 
-		if self.static == 0:
-			fout.write("class_< nodeVirtualEdges<%s> , bases<nodeBlueprint> > (\"%s\",  reinterpret_cast<const char *>(__addedNodes_%s_%s) ) // added by addNewNodes.py \n" %(self.className, fileNameOut, self.type,self.className))
-			fout.write(". def (\"__init__\", make_constructor (nodeFactory%i < nodeVirtualEdges <%s> > )); // added by addNewNodes.py\n"  % (len(self.params), self.className))   #adding constructor with different parameters
+		fout.write("class_< %s , bases<nodeBlueprint> > (\"%s\",  reinterpret_cast<const char *>(__addedNodes_%s_%s) ) // added by addNewNodes.py \n" %(self.className, fileNameOut, self.type,self.className))
+		fout.write(". def (\"__init__\", make_constructor (nodeFactory%i < nodeVirtualEdges <%s> > )); // added by addNewNodes.py\n"  % (len(self.params), self.className))   #adding constructor with different parameters
 			
-		elif self.static == 1:	
-			self.staticEdgeType = self.staticEdgeType.replace ("_","<")
-			hierachy = self.staticEdgeType.count ("<")
-			self.staticEdgeType += ("<")
-			self.staticEdgeBlueprint = self.staticEdgeType + (" edgeVirtual") 
-			self.staticEdgeType = self.staticEdgeType + (" edge")
-
-
-			for i in range (0, hierachy):
-				self.staticEdgeType += (">")
-				self.staticEdgeBlueprint += (">")
-			fout.write("class_< nodeTemplateEdges< %s >  , %s > , %s >, bases<nodeBlueprint> > (\"%s\",  reinterpret_cast<const char *>(__addedNodes_%s_%s) ) // added by addNewNodes.py\n" %(self.staticEdgeType, self.staticEdgeBlueprint,self.className,  fileNameOut, self.type, self.className))
-			fout.write(". def (\"__init__\", make_constructor (nodeFactory%i < nodeTemplateEdges <%s >, %s > , %s > > )); // added by addNewNodes.py\n"  %( len(self.params), self.staticEdgeType, self.staticEdgeBlueprint, self.className))   #adding constructor with different parameters
 	
 		fout.close()
 		del fout

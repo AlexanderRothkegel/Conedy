@@ -595,7 +595,7 @@ void createNetwork::addRandomEdgesDegreeDistributionDirected ( function <double 
 
 nodeDescriptor createNetwork::streamInLattice ( int sizex, int sizey,string s )
 {
-	nodeBlueprint *n = new nodeVirtualEdges<streamInNode >( s );
+	nodeBlueprint *n = new streamInNode( s );
 	nodeDescriptor ret = lattice ( sizex,sizey,1,n, stdEdge );
 	delete n;
 	return ret;
@@ -692,10 +692,10 @@ void createNetwork::normalizeOutputs (baseType r)
 
 	for (it = dynNodes.begin(); it != dynNodes.end(); ++it)
 	{
-		degree =		nodeBlueprint::theNodes[*it]->degree();
-		for (unsigned int i = 0 ; i < nodeBlueprint::theNodes[*it]->degree(); i ++)
+		degree =		dynNode::lookUp(*it)->degree();
+		for (unsigned int i = 0 ; i < dynNode::lookUp(*it)->degree(); i ++)
 		{
-			nodeBlueprint::theNodes[*it]->setWeight (i, r / degree);
+				dynNode::lookUp(*it)->setWeight (i, r / degree);
 		}
 	}
 
@@ -708,33 +708,27 @@ void createNetwork::normalizeInputs (baseType r)
 	nodeList dynNodes;
 	verticesMatching(dynNodes, _dynNode_);
 	for (it = dynNodes.begin(); it != dynNodes.end(); ++it)
-		nodeBlueprint::theNodes[*it]->normalizeInWeightSum(r);
+		dynNode::lookUp(*it)->normalizeInWeightSum(r);
 
 	network::clean();
 }
 
 nodeDescriptor createNetwork::cycle ( int number, int a,nodeBlueprint *n, edgeBlueprint *l )
 {
-
-	int i, j;
-
 	if (number == 0)
 		return - 1;
 	else if (number == 1)
-	{
 		return	addNode(n);
-	}
 
 	unsigned int smallest = addNode(n);
-	for ( i = 1 ; i < number ; i++ )
+	for (unsigned int i = 1 ; i < number ; i++ )
 		addNode ( n );
 
-	for ( j = 0; j < number; j++ )
-		for ( i = 1; i <= a ; i++ )
+	for (unsigned int j = 0; j < number; j++ )
+		for (unsigned int i = 1; i <= a ; i++ )
 		{
-			//           cout << "VON:"<< j<< "NACH:" << ((number + j - i) % number)<< endl;
-			network::link ( smallest + j, smallest + ( ( number + j - i ) % number) ,l );
-			network::link ( smallest + j, smallest + ( ( number + j + i ) % number) ,l );
+			link ( smallest + j, smallest + ( ( number + j - i ) % number) ,l );
+			link ( smallest + j, smallest + ( ( number + j + i ) % number) ,l );
 		}
 	return smallest;
 }
@@ -821,7 +815,7 @@ void createNetwork::rewireTargetDirected ( double prop, nodeKind theNodeKind )
 
 	for ( it = toChange.begin() ; it != toChange.end(); ++it )
 		if (( network::noise.getUniform() <= prop ) )
-			nodeBlueprint::theNodes[it->first]->getEdge(it->second)->targetNumber = r();
+			dynNode::lookUp(it->first)->getEdgeBlueprint(it->second)->targetNumber = r();
 }
 
 
@@ -855,14 +849,14 @@ void createNetwork::rewireWeights ( double prop ,boost::function<double () > r,n
 			newSource = rn();
 			newTarget = rn();
 		}
-		while ( newSource == newTarget || nodeBlueprint::theNodes[newSource]->isLinked ( newTarget ) );   // keine Selbst- und Doppelverbindungen
+		while ( newSource == newTarget || dynNode::lookUp(newSource)->isLinked ( newTarget ) );   // keine Selbst- und Doppelverbindungen
 
 			//			if ((network::theNodes[newSource] == (*it)->source) && (network::theNodes[newTarget] == (*it)->target))
 			//				continue;
 
-		((edgeVirtual*)  getEdge(*it))->setWeight( r() );
+		getEdgeBlueprint(*it)->setWeight( r() );
 
-		network::link ( newSource,newTarget, (edgeBlueprint *) node::theNodes[it->first]-> getEdge(it->second));
+		network::link ( newSource,newTarget,  dynNode::lookUp(it->first)-> getEdgeBlueprint(it->second));
 
 		network::unlink( oldSource, oldTarget);
 	}
@@ -905,12 +899,12 @@ void createNetwork::rewireDirected ( double prop, nodeBlueprint *n )
 			newTarget = r();
 
 		}
-		while ( newSource == newTarget || nodeBlueprint::theNodes[newSource]->isLinked ( newTarget ) );   // keine Selbst- und Doppelverbindungen
+		while ( newSource == newTarget || dynNode::lookUp(newSource)->isLinked ( newTarget ) );   // keine Selbst- und Doppelverbindungen
 
 		if ( ( newSource == oldSource ) && ( newTarget == oldTarget ) )
 			continue;
 
-		network::link ( newSource,newTarget, (edgeBlueprint *)getEdge(*it));
+		network::link ( newSource,newTarget, getEdgeBlueprint(*it));
 		network::remove (*it);
 	}
 
@@ -959,14 +953,14 @@ void createNetwork::replaceEdges ( double prop, edgeBlueprint * l, nodeBlueprint
 			newTarget = r();
 
 		}
-		while ( newSource == newTarget || nodeBlueprint::theNodes[newSource]->isLinked ( newTarget ) );   // keine Selbst- und Doppelverbindungen
+		while ( newSource == newTarget || dynNode::lookUp(newSource)->isLinked ( newTarget ) );   // keine Selbst- und Doppelverbindungen
 
 		if ( ( newSource == oldSource ) && ( newTarget == oldTarget ) )
 			continue;
 
 
 		network::link ( newSource,newTarget, l );
-		nodeBlueprint::theNodes[oldSource]->unlink ( oldTarget );
+		dynNode::lookUp(oldSource)->unlink ( oldTarget );
 
 	}
 	clean();
@@ -1011,13 +1005,13 @@ void createNetwork::rewireUndirected ( double prop, nodeBlueprint * n ) // rewir
 			newTarget = r();
 		}
 
-		while( newSource == newTarget || nodeBlueprint::theNodes[newSource]->isLinked (newTarget )); //keine selfloops und Doppelverbindungen
+		while( newSource == newTarget || dynNode::lookUp(newSource)->isLinked (newTarget )); //keine selfloops und Doppelverbindungen
 
 		if ( ( newSource == oldSource ) && ( newTarget == oldTarget ) )
 			continue;
 
-		network::link ( newSource, newTarget, (edgeBlueprint *)getEdge(*it));
-		network::link ( newTarget, newSource, (edgeBlueprint *)getEdge(*it));
+		network::link ( newSource, newTarget, getEdgeBlueprint(*it));
+		network::link ( newTarget, newSource, getEdgeBlueprint(*it));
 		network::unlink ( oldSource, oldTarget );
 		network::unlink ( oldTarget, oldSource );
 
@@ -1058,11 +1052,11 @@ void createNetwork::rewireTargetUndirected ( double prop, nodeKind theNodeKind )
 			newTarget = r();
 			}
 
-			while ( Source == newTarget || nodeBlueprint::theNodes[Source]->isLinked ( newTarget )  ) ; //keine Selfloops oder Doppelverbindungnen
+			while ( Source == newTarget || dynNode::lookUp(Source)->isLinked ( newTarget )  ) ; //keine Selfloops oder Doppelverbindungnen
 
-			nodeBlueprint::theNodes[it->first]->getEdge(it->second)->targetNumber = newTarget ;
+			dynNode::lookUp(it->first)->getEdgeBlueprint(it->second)->targetNumber = newTarget ;
 
-			network::link ( newTarget, Source, (edgeBlueprint *)getEdge(*it) );
+			network::link ( newTarget, Source, getEdgeBlueprint(*it) );
 			network::unlink ( oldTarget, Source );
 
 		}

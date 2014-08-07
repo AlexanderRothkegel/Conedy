@@ -16,6 +16,7 @@ namespace conedy {
 
 		valarray <baseType> tmp2, dydt, dyt, dym;
 		odeIntegrator *integ;
+		baseType * odeNodeTmp;
 
 		stdOdeIntegrator (networkElementType n, unsigned int dim) : odeNode (n, dim)    {}
 

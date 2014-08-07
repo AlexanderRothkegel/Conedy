@@ -51,7 +51,7 @@ namespace conedy
 //		virtual void randomizeState(randomNumber<baseType> &r) { for (int i = 0; i < Ngls; i++) x[i] = r(); }
 
 
-			virtual void operator() ( baseType xprime [], baseType x[] ) {};
+			virtual void map ( baseType xprime [], baseType x[] ) {};
 			virtual int requiredTimeSteps() { return 1; }
 			//		virtual void swap() { this->state = this->x[0];}
 
@@ -82,7 +82,7 @@ namespace conedy
 
 			virtual void action1()
 			{
-				( *this ) ( mapNodeTmp,this->x );
+				map ( mapNodeTmp,this->x );
 			}
 
 			virtual void swap()

@@ -13,36 +13,28 @@
 
 using namespace std;
 
-// using baseType instead of basetype here, as the gsl does not support long baseType anyway
 
 namespace conedy {
 	//! base class for nodes representing an ODE
 	class odeNode : public containerNode<baseType,1> {
-		private:
-
-		protected:
-			//! Zwischenspeicher, der in der swap-Funktion nach dynNode::x geschrieben wird.
 
 		public:
-			//		odeNode()  {};
-			baseType *odeNodeTmp;
 
 			odeNode(networkElementType n) : // ngls: Anzahl der Gleichungen, NodeNumber,  h Schrittweite
 				containerNode<baseType,1>(n) {}
 
 			odeNode(networkElementType n, unsigned int dim) : // ngls: Anzahl der Gleichungen, NodeNumber,  h Schrittweite
 				containerNode<baseType,1>(n, dim) {}
+
 			virtual ~odeNode() {}
 
-//			virtual void operator()(valarray <baseType> & y , valarray <baseType> & f);
-		//	virtual void operator() ( const baseType x[], baseType dydx[] ) = 0;
+			virtual void dgl (const baseType  x[], baseType  dydx[]) = 0;
 
-			virtual void operator() (const baseType  x[], baseType  dydx[]) = 0;
-			virtual node *construct() { return new node ( *this ); };
+			static int fullDgl ( baseType t,const baseType y[], baseType f[], void *params );
 
-			static int dgl ( baseType t,const baseType y[], baseType f[], void *params );
+         void operator()( const baseType x[], baseType dxdt[]) {fullDgl(dynNode::time, x , dxdt, NULL  );}
 
-			static void dgl (baseType *y, baseType* f);
+			static void fullDgl (baseType *y, baseType* f);
 	};
 }
 

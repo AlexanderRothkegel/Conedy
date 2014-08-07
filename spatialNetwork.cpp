@@ -17,9 +17,9 @@ namespace conedy
 
 void spatialNetwork::connectCloseNodes(node *source, node * target, baseType dist, edgeBlueprint *l)
 {
-	int sourceNodeType = source->getNodeInfo().theNodeType;
+	networkElementType sourceNodeType = source->getNodeInfo().theNodeType;
 
-	int targetNodeType = target->getNodeInfo().theNodeType;
+	networkElementType targetNodeType = target->getNodeInfo().theNodeType;
 
 	nodeList sources, targets;
 	nodeIterator si, ti;
@@ -36,9 +36,9 @@ void spatialNetwork::connectCloseNodes(node *source, node * target, baseType dis
 
 void spatialNetwork::connectCloseNodesTorus(node *source, node * target, baseType dist, edgeBlueprint *l)
 {
-	int sourceNodeType = source->getNodeInfo().theNodeType;
+	networkElementType sourceNodeType = source->getNodeInfo().theNodeType;
 
-	int targetNodeType = target->getNodeInfo().theNodeType;
+	networkElementType targetNodeType = target->getNodeInfo().theNodeType;
 
 	nodeList sources, targets;
 	nodeIterator si, ti;

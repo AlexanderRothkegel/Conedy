@@ -186,7 +186,7 @@ namespace conedy
 		if (!match (l->getNodeInfo().theNodeType, r))
 				return false;
 
-		dynNode *n = (dynNode*) node::theNodes[r];
+		dynNode *n =  dynNode::lookUp(r);
 
 		if ( l->isStandard())
 		{

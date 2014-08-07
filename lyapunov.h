@@ -13,14 +13,14 @@
 	class realign
 	{
 		private:
-			network::nodeList *vl;
+			conedy::network::nodeList *vl;
 			baseType eps;
 			ifstream in;
 			ofstream out;
 			int counter;
 			int skip;
 		public:
-			realign(string input, string output, network::nodeList *theList, baseType theEpsilon, int s)
+			realign(string input, string output, conedy::network::nodeList *theList, baseType theEpsilon, int s)
 			{
 				in.open(input.c_str());
 				out.open(output.c_str());

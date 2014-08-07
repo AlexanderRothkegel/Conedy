@@ -22,8 +22,6 @@ class odeIntegrator
 	public:
 		odeIntegrator (unsigned int size) {
 			dxdt = (baseType *) calloc (size, sizeof(baseType));
-			for (unsigned int i = 0; i < size; i++)
-				dxdt[i] = 0;
 		}
 		virtual ~ odeIntegrator () {
 			free (dxdt);
@@ -71,7 +69,7 @@ class euler : public odeIntegrator
 	template <typename dgl>
 		void step (double dt, baseType *state, dgl &func, unsigned int size)
 		{
-			func.dgl(state,dxdt);
+			func(state,dxdt);
 			for (unsigned int i = 0; i < size; i++)
 				state[i] += dt * dxdt[i];
 		}
@@ -101,19 +99,19 @@ class rk4 : public odeIntegrator
 	template <typename dgl>
 		void step (const double dt, baseType * const state, dgl &func, unsigned int size)
 		{
-			func.dgl(state,dxdt);
+			func(state,dxdt);
 			
 			for (unsigned int i = 0; i < size; i++)
 				intermediateState[i] = state[i] + dt * dxdt[i] * 0.5;
-			func.dgl(intermediateState,dxdt2);
+			func(intermediateState,dxdt2);
 			
 			for (unsigned int i = 0; i < size; i++)
 				intermediateState[i] = state[i] + dt * dxdt2[i] * 0.5;
-			func.dgl(intermediateState,dxdt3);
+			func(intermediateState,dxdt3);
 			
 			for (unsigned int i = 0; i < size; i++)
 				intermediateState[i] = state[i] + dt * dxdt3[i];
-			func.dgl(intermediateState,dxdt4);
+			func(intermediateState,dxdt4);
 
 			for (unsigned int i = 0; i < size; i++)
 				state[i] += dt * ( dxdt[i] + 2*dxdt2[i] + 2*dxdt3[i] + dxdt4[i] ) * FRAC(1,6);
@@ -159,7 +157,7 @@ class rkf45 : public odeIntegrator
 			baseType dt = maxdt;
 			baseType errorrel;
 			
-			func.dgl(state,dxdt);
+			func(state,dxdt);
 			
 			do
 			{
@@ -173,20 +171,20 @@ class rkf45 : public odeIntegrator
 				for (unsigned int i = 0; i < size; i++)
 					intermediateState[i] = state[i]
 								+ dt * dxdt[i] * (1./4.);
-				func.dgl(intermediateState,dxdt2);
+				func(intermediateState,dxdt2);
 				
 				for (unsigned int i = 0; i < size; i++)
 					intermediateState[i] = state[i] + dt * (
 								  dxdt [i] * FRAC(3,32)
 								+ dxdt2[i] * FRAC(9,32));
-				func.dgl(intermediateState,dxdt3);
+				func(intermediateState,dxdt3);
 				
 				for (unsigned int i = 0; i < size; i++)
 					intermediateState[i] = state[i] + dt * (
 								  dxdt [i] * FRAC(1932,2197)
 								- dxdt2[i] * FRAC(7200,2197)
 								+ dxdt3[i] * FRAC(7296,2197)) ;
-				func.dgl(intermediateState,dxdt4);
+				func(intermediateState,dxdt4);
 				
 				for (unsigned int i = 0; i < size; i++)
 					intermediateState[i] = state[i] + dt *(
@@ -194,7 +192,7 @@ class rkf45 : public odeIntegrator
 								- dxdt2[i] * 8
 								+ dxdt3[i] * FRAC(3680,513)
 								- dxdt4[i] * FRAC(845,4104));
-				func.dgl(intermediateState,dxdt5);
+				func(intermediateState,dxdt5);
 				
 				for (unsigned int i = 0; i < size; i++)
 					intermediateState[i] = state[i] + dt *(
@@ -203,7 +201,7 @@ class rkf45 : public odeIntegrator
 								- dxdt3[i] * FRAC(3544,2565)
 								+ dxdt4[i] * FRAC(1859,4104)
 								- dxdt5[i] * FRAC(11,40));
-				func.dgl(intermediateState,dxdt6);
+				func(intermediateState,dxdt6);
 				
 				for (unsigned int i = 0; i < size; i++)
 					dy[i] = dt * (
@@ -258,9 +256,9 @@ class eulerMaruyama : public sdeIntegrator
 		eulerMaruyama( unsigned int size) : sdeIntegrator (size)	{}
 
 
-		template <typename dgl>
-			void step (double dt, baseType *state, dgl &func, unsigned int size)			{
-				func.dgl (state, dxdt, s, dsdx);
+		template <typename SDGL>
+			void step (double dt, baseType *state, SDGL &func, unsigned int size)			{
+				func (state, dxdt, s, dsdx);
 				for (unsigned int i = 0; i < size ; i++)
 					state[i] = state[i] + dxdt[i] * dt + s[i] * sqrt (dt) * gslNoise::getGaussian();
 			}
@@ -272,10 +270,10 @@ class milsteinIto	: public sdeIntegrator
 	public:
 		milsteinIto( unsigned int size) : sdeIntegrator (size){}
 
-		template <typename dgl>
-			void step (double dt, baseType *state, dgl &func, unsigned int size)		{
+		template <typename SDGL>
+			void step (double dt, baseType *state, SDGL &func, unsigned int size)		{
 				double W;
-				func.dgl (state, dxdt, s, dsdx);
+				func (state, dxdt, s, dsdx);
 				for (unsigned int i = 0; i < size ; i++)			{
 					W = gslNoise::getGaussian();
 					state [i] = state [i] + dxdt[i] * dt + s[i] * sqrt ( dt) * W + 0.5 * s[i] * dsdx[i] * ( dt * W *W - dt);
@@ -289,11 +287,11 @@ class milsteinStrato	: public sdeIntegrator
 	public:
 
 		milsteinStrato( unsigned int size) : sdeIntegrator (size)	{}
-		template <typename dgl>
-			void step (double dt, baseType *state, dgl &func, unsigned int size)
+		template <typename SDGL>
+			void step (double dt, baseType *state, SDGL &func, unsigned int size)
 			{
 				double W;
-				func.dgl (state, dxdt, s, dsdx);
+				func (state, dxdt, s, dsdx);
 				for (unsigned int i = 0; i < size ; i++)
 				{
 					W = gslNoise::getGaussian();
@@ -361,7 +359,7 @@ class strongTaylor : public sdeIntegrator
 			a10 = a10*sqrt(2.0*dt)/M_PI - 2*sqrt(dt*rho)*gslNoise::getGaussian();
 			dZ = 0.5*dt*(dW + a10);
 
-			func.dgl(state, dxdt, dydW);
+			func(state, dxdt, dydW);
 
 
 			for (unsigned int i = 0; i < size; i++)
@@ -369,13 +367,13 @@ class strongTaylor : public sdeIntegrator
 
 			//second step
 
-			func.dgl(tmp2, dyt, dydW);
+			func(tmp2, dyt, dydW);
 			for (unsigned int i = 0; i < size; i++)	                                    
 				tmp2[i] = state[i] + dxdt[i]*dt - dydW[i]*sqdt;                        
 
 			//third step
 
-			func.dgl(tmp2, dym, dydW);
+			func(tmp2, dym, dydW);
 			for (unsigned int i = 0; i < size; i++)                                    
 				state[i] += dydW[i]*dW + (dyt[i] - dym[i])/((baseType)2.0*sqdt)*dZ + (dyt[i] + dym[i] + (baseType)2.0*dxdt[i])/(baseType)4.0*dt;	
 		}

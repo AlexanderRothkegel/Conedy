@@ -8,12 +8,4 @@
 #include "fullNetwork.h"
 
 
-using namespace conedy;
-
-
-
-
-
-
-
 #endif

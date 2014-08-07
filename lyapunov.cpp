@@ -2,6 +2,10 @@
 #include "lyapunov.h"
 #include <iomanip>
 #include <queue>
+
+using namespace conedy;
+
+
 	meanVar realign::calculateDist(vector <baseType> &states)
 	{
 
@@ -13,7 +17,7 @@
 		unsigned int i=0;
 		for (vi = vl->begin(); vi != vl->end();vi++)
 		{
-			diff = states[i] - node::theNodes[*vi]->getState();
+			diff = states[i] - dynNode::lookUp(*vi)->getState();
 			if (diff > 0.5)
 				diff = diff - 1.0;
 			if (diff < -0.5)
@@ -126,7 +130,7 @@
 		for (vi = vl->begin(); vi != vl->end();vi++)
 		{
 			//				baseType stat = theNodes[*vi]->getState();
-			baseType diff =  along[i] - node::theNodes[*vi]->getState() ;
+			baseType diff =  along[i] - dynNode::lookUp(*vi)->getState();
 
 			if (diff > 0.5)
 				diff = diff - 1;
@@ -162,7 +166,7 @@
 		boost::function<baseType () > r =  bind(&frontAndPop, &states);
 		for (vi = vl->begin(); vi != vl->end();vi++)
 		{
-			((dynNode*)  node::theNodes[*vi]) ->	randomizeState( r) ;
+			 dynNode::lookUp(*vi) ->	randomizeState( r) ;
 		}
 
 	}

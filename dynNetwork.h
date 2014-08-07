@@ -32,7 +32,7 @@ namespace conedy
 			//! Evolve the system time from startTime to endTime
 			void evolve ( baseType startTime, baseType endTime );
 
-			baseType getParam(nodeDescriptor nodeNumber,string name) {	return ((dynNode*) (node::theNodes[nodeNumber]))->getParam(name); }
+			baseType getParam(nodeDescriptor nodeNumber,string name) {	return dynNode::lookUp(nodeNumber)->getParam(name); }
 
 			//! return component <component> of node <node>
 			baseType getState (nodeDescriptor node, nodeDescriptor component = 0);
@@ -80,7 +80,7 @@ namespace conedy
 			//! Print the value of all registered observables to files.
 			void snapshot () { callBack (0); }
 
-			void setParam (nodeDescriptor nd, string parameterName, baseType value) { ((dynNode *)node::theNodes[nd])-> setParam (parameterName, value); }
+			void setParam (nodeDescriptor nd, string parameterName, baseType value) { ((dynNode *)dynNode::lookUp(nd))-> setParam (parameterName, value); }
 
 			//! set state of node n with the values given in the vector <argList>
 			void setInitialConditionVec ( int n, vector <baseType> argList );

@@ -7,12 +7,8 @@
 
 
 
-//#include "node.h"
 #include "params.h"
 #include <boost/function.hpp>
-//#include <gsl/gsl_errno.h>
-//#include <gsl/gsl_matrix.h>
-//#include <gsl/gsl_odeiv2.h>
 #include "dynNode.h"
 
 #include <list>
@@ -36,6 +32,7 @@ namespace conedy
 		class containerNode : public dynNode 
 	{
 		protected:
+			static const unsigned int initialContainerSize = 4096;
 			//! static pointer to the dynamical variables of all nodes in the container
 			static T * dynamicVariablesOfAllDynNodes;
 			//! the number of used indices, the smallest unused index
@@ -46,33 +43,17 @@ namespace conedy
 			typedef  list<containerNode<T,N> *> containerNodeList;
 			static containerNodeList nodeList;
 
-
-			params<T> p;
-
-
-
-
-			// Hilfsfunktionen für die GSL:
-
-
 		public:
-			unsigned int startPosGslOdeNodeArray;
+			unsigned int startPosInContainerNodeArray;
 
-			virtual baseType getState (unsigned int component) { return dynamicVariablesOfAllDynNodes[ startPosGslOdeNodeArray + component ]; }
+			virtual baseType getState (unsigned int component) { return dynamicVariablesOfAllDynNodes[startPosInContainerNodeArray+component]; }
 
 			static unsigned int containerDimension () { return usedIndices;}	
-			containerNode (networkElementType n ) : dynNode ( n), p ( _containerNode_ )		{		};
-			containerNode (networkElementType n, unsigned int dim ) : dynNode ( n, dim), p ( _containerNode_ )		{		};
+			containerNode (networkElementType n ) : dynNode ( n) 	{		};
+			containerNode (networkElementType n, unsigned int dim ) : dynNode ( n, dim) 	{		};
 
 
-			virtual void dynamics() { throw "dynamics of containerNode called"; }
-
-
-			static void clear()
-			{
-				usedIndices = 0;
-				nodeList.clear();
-			}
+			static void clear() {usedIndices = 0;nodeList.clear();}
 
 			virtual bool timeEvolution ()   // only the first element of the container will be called for time evolution.
 			{ 
@@ -80,19 +61,18 @@ namespace conedy
 					return 1; 
 				else
 					return 0;
-
 			}
 
 
-			containerNode ( const containerNode & c ) : dynNode ( c ), p ( _containerNode_ )
-		{
+			containerNode ( const containerNode & c ) : dynNode ( c )
+			{
 
 			free( this->x);
 
 			if ( usedIndices == 0 )    // first node in the container. Reserve memory according two gslOdeNode_arraySize
 			{
-				dynamicVariablesOfAllDynNodes = ( T* ) calloc ( p.getParams ( 0 ),sizeof ( T ) );
-				sizeOfArray = p.getParams(0);
+				dynamicVariablesOfAllDynNodes = ( T* ) calloc ( initialContainerSize,sizeof ( T ) );
+				sizeOfArray = initialContainerSize; 
 			}
 
 
@@ -108,12 +88,7 @@ namespace conedy
 					T* pointer = newArray;
 
 					usedIndices = 0;
-
-
-
 					typename containerNodeList::iterator it;
-
-
 
 					for (it = nodeList.begin(); it != nodeList.end(); it++)
 					{
@@ -123,26 +98,19 @@ namespace conedy
 
 
 						(*it)->x = pointer;
-						(*it)->startPosGslOdeNodeArray = usedIndices;
+						(*it)->startPosInContainerNodeArray = usedIndices;
 						pointer = pointer + (*it)->dimension();
 						usedIndices = usedIndices + (*it)->dimension();
 					}
-
 					free (dynamicVariablesOfAllDynNodes);
 					dynamicVariablesOfAllDynNodes = newArray;
-
 				}
-
-
 			}
 			this->x =  &dynamicVariablesOfAllDynNodes[usedIndices];
 
 			nodeList.push_back ( this );
-			startPosGslOdeNodeArray = usedIndices;
+			startPosInContainerNodeArray = usedIndices;
 			usedIndices += (&c)->dimension();
-
-
-
 		}
 
 
@@ -150,7 +118,6 @@ namespace conedy
 			//! Lücken füllen und zusammenschieben
 			static void realign ()   
 			{
-
 				typename containerNodeList::iterator it;
 
 				T* pointer = dynamicVariablesOfAllDynNodes;
@@ -159,7 +126,7 @@ namespace conedy
 				for (it = nodeList.begin(); it != nodeList.end(); it++)
 				{
 
-					while (usedIndices + offset != (*it)->startPosGslOdeNodeArray)
+					while (usedIndices + offset != (*it)->startPosInContainerNodeArray)
 						offset++;
 					for (unsigned int i = 0; i < (*it)->dimension(); i++)
 					{
@@ -171,7 +138,6 @@ namespace conedy
 				}
 			}
 
-			//! 1. und einizger Intergrationsschritt:
 
 			virtual ~containerNode()
 			{
@@ -189,18 +155,11 @@ namespace conedy
 
 			//! clean: wird vor der Integration aufgerufen und initialisiert diverse GSL-Parameter (Art der Stufenfunktion, Schrittweite usw.)
 			virtual void clean ()
-			{
-				realign();
-
-			}
+			{ dynNode::clean(); realign(); }
 
 			bool amIFirst()	 { return ( (*nodeList.begin()) == this);  }
 
 
-			static void registerStandardValues()
-			{
-				params<T>::registerStandard ( _containerNode_,"containerNode_arraySize", 0,4096 );
-			}
 
 
 	};

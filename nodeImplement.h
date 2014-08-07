@@ -71,7 +71,10 @@ namespace conedy {
 			nodeVirtualEdges () : DYNNODE ( ) {}
 			nodeVirtualEdges (string s) : DYNNODE (s) {}
 			nodeVirtualEdges (unsigned int i) : DYNNODE (i) {}
+			nodeVirtualEdges (networkElementType nt, unsigned int dim) : DYNNODE (nt, dim) {}
 
+
+//			node * construct () { return new nodeVirtualEdges<DYNNODE> (*this); }
 
 			virtual void clean () {
 
@@ -119,7 +122,7 @@ namespace conedy {
 			virtual nodeDescriptor getTarget(edgeDescriptor theEdge) { return outEdges[theEdge]->getTarget(); }
 			virtual baseType getWeight (edgeDescriptor theEdge) { return outEdges[theEdge]->getWeight(); }
 			virtual baseType getTargetState (edgeDescriptor theEdge) { return outEdges[theEdge]->getTargetState(); }
-			virtual edgeVirtual * getEdge (edgeDescriptor eD){ return outEdges[eD]; }
+			virtual edgeVirtual * getEdgeBlueprint (edgeDescriptor eD){ return outEdges[eD]; }
 
 			// Verbindungen hinzufügen, entfernen
 			virtual bool unlink (nodeDescriptor targetNumber);
@@ -139,10 +142,6 @@ namespace conedy {
 			//		virtual void printStatistics();
 
 
-			virtual node *construct()
-			{
-				return  new nodeVirtualEdges<DYNNODE>( *this );
-			};
 
 
 			// Statistikkram
@@ -207,7 +206,7 @@ namespace conedy {
 
 			for ( s=outEdges.begin(); s != outEdges.end(); s++ )
 			{
-				if ((*s)->targetNumber  == target )
+				if ((*s)->getTarget()== target )
 				{
 					res = true;
 					//				outEdges.remove(s);
@@ -295,7 +294,7 @@ baseType nodeVirtualEdges<DYNNODE>::inWeightSum() {
 	baseType res = 0;
 	vector<node *>::iterator it;
 	
-	for (unsigned int i = 0 ; i < DYNNODE::theNodes.size(); i++)
+	for (unsigned int i = 0 ; i < node::theNodes.size(); i++)
 		res+= linkStrength(i);
 	
 	return res;
@@ -426,6 +425,7 @@ class nodeTemplateEdges : public DYNNODE
 		//! Variable, die von der Klasse offeriert wird, zum Beispiel zum Einkoppeln in andere Nodes
 		baseType state;
 
+//		node * construct () { return new nodeTemplateEdges<EDGE, EDGEVIRTUAL, DYNNODE> (*this); }
 
 
 		virtual void removeEdge	(edgeDescriptor e)
@@ -473,6 +473,9 @@ class nodeTemplateEdges : public DYNNODE
 		//! Dieser Konstruktor ist nur zum Konstruieren der  Blaupausen gedacht. Echte Knoten im Netzwerk werden von Blaupausenknoten über construct erzeugt.
 		nodeTemplateEdges () :state ( 0 ) {};
 
+		nodeTemplateEdges (networkElementType nt, unsigned int dim) : DYNNODE (nt, dim) {}
+
+
 		//		list< edgeDescriptor >
 
 		//! Private Variable, in denen die Edgess gespeichert werden
@@ -483,12 +486,8 @@ class nodeTemplateEdges : public DYNNODE
 		virtual nodeDescriptor getTarget(edgeDescriptor theEdge) { return   outEdges[theEdge].getTarget(); }
 		virtual baseType getWeight (edgeDescriptor theEdge) { return outEdges[theEdge].getWeight(); }
 		virtual baseType getTargetState (edgeDescriptor theEdge) { return outEdges[theEdge].getTargetState(); }
-		virtual edgeVirtual * getEdge (edgeDescriptor eD);
+		virtual edgeVirtual * getEdgeBlueprint (edgeDescriptor eD);
 
-		virtual node *construct()
-		{
-			return  new nodeTemplateEdges< EDGE, EDGEVIRTUAL, DYNNODE>( *this );
-		};
 
 		// Verbindungen hinzufügen, entfernen
 		virtual bool unlink (nodeDescriptor targetNumber);
@@ -562,7 +561,7 @@ void nodeTemplateEdges<EDGE,EDGEVIRTUAL, DYNNODE>::fire ()
 }
 
 	template <typename EDGE, typename EDGEVIRTUAL, typename DYNNODE>
-edgeVirtual * nodeTemplateEdges< EDGE,EDGEVIRTUAL, DYNNODE >::getEdge (edgeDescriptor eD)
+edgeVirtual * nodeTemplateEdges< EDGE,EDGEVIRTUAL, DYNNODE >::getEdgeBlueprint (edgeDescriptor eD)
 {
 	vector <baseType> parameter;
 	outEdges[eD].getParameter(parameter);
@@ -593,7 +592,7 @@ baseType nodeTemplateEdges<EDGE,EDGEVIRTUAL, DYNNODE>::inWeightSum ()
 	baseType res = 0;
 	vector<node *>::iterator it;
 	
-	for (unsigned int i = 0 ; i < DYNNODE::theNodes.size(); i++)
+	for (unsigned int i = 0 ; i < node::theNodes.size(); i++)
 		res+= linkStrength(i);
 	
 	return res;

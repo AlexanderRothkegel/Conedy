@@ -1,6 +1,8 @@
 #include "ioNode.h"
 #include <complex>
 
+using namespace boost::iostreams;
+
 namespace conedy
 {
 
@@ -111,7 +113,7 @@ namespace conedy
 		}
 	}
 
-	streamOutNodeBinary::streamOutNodeBinary ( string s, networkElementType n )   : dynNode ( n )
+	streamOutNodeBinary::streamOutNodeBinary ( string s, networkElementType n )   : nodeVirtualEdges<dynNode> ( n )
 	{
 		//		s = "output/"+ s;
 
@@ -180,7 +182,7 @@ namespace conedy
 		}
 	}
 
-	streamOutNode::streamOutNode ( string s, networkElementType n )   : dynNode ( n )
+	streamOutNode::streamOutNode ( string s, networkElementType n )   : nodeVirtualEdges<dynNode> ( n )
 	{
 		//		s = "output/"+ s;
 
@@ -190,12 +192,12 @@ namespace conedy
 
 			if ( getGlobal<bool> ("outputCompress") )
 			{
-				newOut->push ( gzip_compressor() );
+				newOut->push ( io::gzip_compressor() );
 				//				cout << "Schreibe Daten gepackt ..." << endl;
 			}
 			if ( getGlobal<bool> ("outputAppend") )
 			{
-				io::file_sink fs = file_sink( s.c_str(), ios_base::out | ios_base::app);
+				io::file_sink fs = io::file_sink( s.c_str(), ios_base::out | ios_base::app);
 				if (!fs.is_open())
 					throw "cannot open file for writing. ";
 				newOut->push ( fs );
@@ -203,7 +205,7 @@ namespace conedy
 			}
 			else
 			{
-				io::file_sink fs = file_sink( s.c_str(), ios_base::out);
+				io::file_sink fs = io::file_sink( s.c_str(), ios_base::out);
 //				io::file_sink fs = file_sink("stupid", ios_base::out);
 
 				if (!fs.is_open())
@@ -253,7 +255,7 @@ namespace conedy
 
 
 
-	streamInNode::streamInNode ( string s, networkElementType n )   : dynNode ( n, 1 )
+	streamInNode::streamInNode ( string s, networkElementType n )   : nodeVirtualEdges<dynNode> ( n, 1 )
 	{
 		//		s = "output/"+ s;
 
@@ -263,10 +265,10 @@ namespace conedy
 
 			if ( zipInput() )
 			{
-				newIn->push ( gzip_decompressor() );
+				newIn->push ( io::gzip_decompressor() );
 			}
 
-			io::file_source fs = file_source(s.c_str());
+			io::file_source fs = io::file_source(s.c_str());
 			if (!fs.is_open())
 				throw "cannot open file for reading. ";
 

@@ -39,13 +39,6 @@ namespace conedy
 
 	}
 
-	void dynNetwork::dynamics(nodeDescriptor n)
-	{
-		dynNode::lookUp(n)-> dynamics();
-	}
-
-
-
 
 	void dynNetwork::snapshotAtEventSignature ( nodeDescriptor eventSignature)
 	{
@@ -62,7 +55,7 @@ namespace conedy
 
 	void dynNetwork::snapshotAtEventOfNode (nodeDescriptor nodeNumber, unsigned int eventSignature)
 	{
-		eventHandler * e = ( pcoBase * ) node::theNodes[nodeNumber];
+		eventHandler * e = ( pcoBase * ) dynNode::lookUp(nodeNumber);
 
 
 		snapshotAtEvent ( e->myEventsStartAt + eventSignature);
@@ -88,9 +81,9 @@ namespace conedy
 	baseType dynNetwork::getState (nodeDescriptor node, nodeDescriptor which)
 	{
 		if (which == 0)
-			return node::theNodes[node]->getState();
+			return dynNode::lookUp(node)->getState();
 		else
-			return (( (dynNode* )node::theNodes[node])->getState(which));
+			return (( (dynNode* )dynNode::lookUp(node))->getState(which));
 	}
 
 	void dynNetwork::evolveFor ( baseType duration )
@@ -141,7 +134,7 @@ namespace conedy
 				timeTilEvent = eventHandler::nextEvent() - dynNode::time;
 
 
-			if (timeTilEvent > -0.0)
+			if (timeTilEvent > 0.0)
 			{
 				for ( it = evolveList.begin(); it != evolveList.end(); ++it )
 					( *it )->evolve ( timeTilEvent );
@@ -360,7 +353,7 @@ namespace conedy
 		nodeList vl;
 		verticesMatching (vl, n);
 		for (it = vl.begin();it != vl.end(); it ++)
-			( ( dynamic_cast<dynNode*>( node::theNodes[*it] )->randomizeParameter ( s,n,r )));
+			( ( dynamic_cast<dynNode*>( dynNode::lookUp(*it) )->randomizeParameter ( s,n,r )));
 
 
 
@@ -394,7 +387,7 @@ namespace conedy
 #endif
 			// Änderung 10.06.2009: Pointertyp geändert (HD) -> funktioniert nun
 			//((params<baseType>*)theNodes[i])->randomizeParameter(parameterString, theNodeType, r);
-			( ( dynamic_cast<dynNode*>( node::theNodes[*vi] )->randomizeParameter ( parameterString, theNodeType, r )));
+			( ( dynamic_cast<dynNode*>( dynNode::lookUp(*vi) )->randomizeParameter ( parameterString, theNodeType, r )));
 		}
 		//		delete in;
 	}
@@ -413,7 +406,7 @@ namespace conedy
 					initialCond.push ( r() );
 
 
-					( ( dynamic_cast<dynNode*>(node::theNodes[i + size * j] )->randomizeState ( r )));
+					( ( dynamic_cast<dynNode*>(dynNode::lookUp(i + size * j) )->randomizeState ( r )));
 
 				}
 
@@ -439,8 +432,8 @@ namespace conedy
 				{
 					initialCond.push ( -1.0 );
 
-					if ( node::theNodes[i + size *j]->getNodeInfo().theNodeKind & _dynNode_ )
-						for ( unsigned int n = 0; n > ( ( dynamic_cast<dynNode*>( node::theNodes[i+size*j] )->dimension())) - 1; n = n + 1 )
+					if ( dynNode::lookUp(i + size *j)->getNodeInfo().theNodeKind & _dynNode_ )
+						for ( unsigned int n = 0; n > ( ( dynamic_cast<dynNode*>( dynNode::lookUp(i+size*j) )->dimension())) - 1; n = n + 1 )
 							initialCond.push ( 40.0 );
 
 
@@ -456,8 +449,8 @@ namespace conedy
 
 
 
-					if ( node::theNodes[i + size *j]->getNodeInfo().theNodeKind & _dynNode_ )
-						for ( unsigned int n = 0; n > ( ( dynamic_cast<dynNode*>( node::theNodes[i+size*j] )->dimension())) - 1; n = n + 1 )
+					if ( dynNode::lookUp(i + size *j)->getNodeInfo().theNodeKind & _dynNode_ )
+						for ( unsigned int n = 0; n > ( ( dynamic_cast<dynNode*>( dynNode::lookUp(i+size*j) )->dimension())) - 1; n = n + 1 )
 							initialCond.push ( 0.0 );
 
 
@@ -475,15 +468,12 @@ namespace conedy
 
 
 		vector< node * >::iterator  it;
+		nodeList vl;
+		verticesMatching (vl, _dynNode_);
 
-		for ( it = node::theNodes.begin(); it != node::theNodes.end(); ++it )
+		for (nodeIterator it = vl.begin(); it != vl.end(); ++it) 
 		{
-			//			if ( ( *it )->getNodeInfo().theNodeKind & _dynNode_ == 0 )
-			//				continue;
-			////				continue;
-
-			//			( ( dynamic_cast<dynNode*>( ( *it ) )->state = r();
-			( ( dynamic_cast<dynNode*>( ( *it ) )))->randomizeState ( r );
+			dynNode::lookUp(*it) ->randomizeState ( r );
 		}
 
 
@@ -506,7 +496,7 @@ namespace conedy
 		queue<baseType> initialCond;
 
 
-		unsigned int size = sqrt ( (baseType) node::theNodes.size() );
+		unsigned int size = sqrt ( numberVertices() );
 
 		for ( unsigned int i = 0; i < size; i++ )
 			for ( unsigned int j = 0; j < size; j++ )
@@ -514,8 +504,8 @@ namespace conedy
 				if ( i< size/3 || i > 2*size/3 )
 				{
 					initialCond.push ( -1.0 );
-					if ( node::theNodes[i + size *j]->getNodeInfo().theNodeKind & _dynNode_ )
-						for ( unsigned int n = 0; n >  dynamic_cast<dynNode*>(node::theNodes[i+size*j] )->dimension() - 1; n = n + 1 )
+					if ( dynNode::lookUp(i + size *j)->getNodeInfo().theNodeKind & _dynNode_ )
+						for ( unsigned int n = 0; n >  dynamic_cast<dynNode*>(dynNode::lookUp(i+size*j) )->dimension() - 1; n = n + 1 )
 							initialCond.push ( 40.0 );
 				}
 				else
@@ -527,8 +517,8 @@ namespace conedy
 
 
 
-					if ( node::theNodes[i + size *j]->getNodeInfo().theNodeKind & _dynNode_ )
-						for ( unsigned int n = 0; n > dynamic_cast<dynNode*>( node::theNodes[i+size*j] )->dimension() - 1; n = n + 1 )
+					if ( dynNode::lookUp(i + size *j)->getNodeInfo().theNodeKind & _dynNode_ )
+						for ( unsigned int n = 0; n > dynamic_cast<dynNode*>( dynNode::lookUp(i+size*j) )->dimension() - 1; n = n + 1 )
 							initialCond.push ( 0.0 );
 
 
@@ -545,17 +535,11 @@ namespace conedy
 		boost::function<baseType () > r = bind ( &frontAndPop,&initialCond );
 
 
-		vector< node * >::iterator  it;
+		nodeList nl;
+		verticesMatching(nl,_dynNode_);
 
-		for ( it = node::theNodes.begin(); it != node::theNodes.end(); ++it )
-		{
-			//			if ( ( *it )->getNodeInfo().theNodeKind & _dynNode_ == 0 )
-			//				continue;
-			////				continue;
-
-			//			( ( dynamic_cast<dynNode*>( ( *it ) )->state = r();
-			dynamic_cast<dynNode*>( ( *it ) )->randomizeState ( r );
-		}
+		for (nodeIterator it = nl.begin(); it != nl.end(); ++it)
+			dynNode::lookUp(*it ) ->randomizeState ( r );
 
 
 
@@ -575,12 +559,12 @@ namespace conedy
 
 	void dynNetwork::observeEventSignatureTimes( string fileName,nodeDescriptor eventNumber) {
 
-		nodeBlueprint* nod = new nodeVirtualEdges<timeNode<baseType> >();
+		nodeBlueprint* nod = new timeNode<baseType> ();
 		nodeDescriptor timeNodeNumber = addNode ( nod );
 		delete nod;
 
 		nodeDescriptor streamOutNodeNumber = addStreamOutNode(fileName);
-		streamOutNode *s = dynamic_cast<streamOutNode*>( nodeBlueprint::theNodes[streamOutNodeNumber]);
+		streamOutNode *s = dynamic_cast<streamOutNode*>(dynNode::lookUp(streamOutNodeNumber));
 
 		eventHandler::insertVisiterAtSignature(bind(&streamOutNode::evolve,s, 0.0),eventNumber);
 		delete nod;
@@ -591,13 +575,13 @@ namespace conedy
 
 	void dynNetwork::observeEventTimesEquals( string fileName,nodeDescriptor eventNumber) {
 
-		nodeBlueprint* nod = new nodeVirtualEdges<timeNode<baseType> >();
+		nodeBlueprint* nod = new timeNode<baseType> ();
 		nodeDescriptor timeNodeNumber = addNode ( nod );
 		delete nod;
 
-		nod = new  nodeVirtualEdges<streamOutNodeCountEquals>(fileName);
+		nod = new  streamOutNodeCountEquals(fileName);
 		nodeDescriptor streamOutNodeNumber = addNode(nod);
-		streamOutNode *s = dynamic_cast<streamOutNode*>( nodeBlueprint::theNodes[streamOutNodeNumber]);
+		streamOutNode *s = dynamic_cast<streamOutNode*>(dynNode::lookUp(streamOutNodeNumber));
 
 		eventHandler::insertVisiterAtSignature(bind(&streamOutNode::evolve,s, 0.0),eventNumber);
 		delete nod;
@@ -607,13 +591,13 @@ namespace conedy
 	}
 
 	void dynNetwork::observeEventTimes( string fileName,nodeDescriptor eventNumber) {
-		nodeBlueprint* nod = new nodeVirtualEdges<timeNode<baseType> >();
+		nodeBlueprint* nod = new timeNode<baseType> ();
 		nodeDescriptor timeNodeNumber = addNode ( nod );
 		delete nod;
 
-		nod = new  nodeVirtualEdges<streamOutNode>(fileName);
+		nod = new  streamOutNode(fileName);
 		nodeDescriptor streamOutNodeNumber = addNode(nod);
-		streamOutNode *s = dynamic_cast<streamOutNode*>( nodeBlueprint::theNodes[streamOutNodeNumber]);
+		streamOutNode *s = dynamic_cast<streamOutNode*>( dynNode::lookUp(streamOutNodeNumber));
 
 		eventHandler::insertVisiter(bind(&streamOutNode::evolve,s, 0.0),eventNumber);
 		delete nod;
@@ -627,26 +611,26 @@ namespace conedy
 
 	void dynNetwork::observeEvent (string s, nodeDescriptor signature)
 	{
-		nodeBlueprint* nod = new nodeVirtualEdges <eventCountNode >(signature);
+		nodeBlueprint* nod = new eventCountNode (signature);
 		nodeDescriptor newNodeNumber = addNode ( nod );
 
 		delete nod;
-		nod = new nodeVirtualEdges <streamOutNode > ( s );
+		nod = new streamOutNode  ( s );
 		nodeDescriptor outNodeNumber = addNode ( nod );
 		link ( outNodeNumber, newNodeNumber);
-		inOutNodeList.push_back ( dynamic_cast<dynNode*> ( node::theNodes[outNodeNumber] ));
+		inOutNodeList.push_back ( dynamic_cast<dynNode*> ( dynNode::lookUp(outNodeNumber) ));
 		delete nod;
 	}
 
 	void dynNetwork::observeTime ( string s )
 	{
-		nodeBlueprint* nod = new nodeVirtualEdges<timeNode<baseType> >();
+		nodeBlueprint* nod = new timeNode<baseType> ();
 		nodeDescriptor timeNodeNumber = addNode ( nod );
 		delete nod;
 		nodeDescriptor streamNode = addStreamOutNode (s);
 
 		link ( streamNode, timeNodeNumber);
-		inOutNodeList.push_back ( dynamic_cast<dynNode*> ( nodeBlueprint::theNodes[streamNode] ));
+		inOutNodeList.push_back ( dynamic_cast<dynNode*> ( dynNode::lookUp(streamNode) ));
 
 
 	}
@@ -654,7 +638,7 @@ namespace conedy
 
 	void dynNetwork::observeComponents (nodeDescriptor n, string fileName)
 	{
-		unsigned int dimension =   ((dynNode*) node::theNodes[n])-> dimension();
+		unsigned int dimension =   ((dynNode*) dynNode::lookUp(n))-> dimension();
 
 
 		component<edgeVirtual> * l;
@@ -676,14 +660,14 @@ namespace conedy
 	{
 
 
-		nodeBlueprint *nod = new nodeVirtualEdges <streamOutNode> ( s );
+		nodeBlueprint *nod = new streamOutNode ( s );
 		int newNodeNumber = addNode ( nod );
 
 		//	unsigned int nodeNumbers = numberVertices(_dynNode_);
 		//	l->setWeight(1.0/nodeNumbers);
 		network::addEdges ( newNodeNumber,_dynNode_,l );
 
-		inOutNodeList.push_back ( dynamic_cast<dynNode*> (nodeBlueprint::theNodes[newNodeNumber] ));
+		inOutNodeList.push_back ( dynamic_cast<dynNode*> (dynNode::lookUp(newNodeNumber) ));
 		//	addEnterNode ( s );
 		delete nod;
 	}
@@ -706,7 +690,7 @@ namespace conedy
 	void dynNetwork::observePhaseCoherence ( string s, edgeBlueprint *l, nodeBlueprint *n)
 	{
 
-		nodeBlueprint *nod = new nodeVirtualEdges < calculateMeanPhaseCoherence > ();
+		nodeBlueprint *nod = new calculateMeanPhaseCoherence  ();
 		nodeDescriptor newNodeNumber = addNode ( nod );
 
 		nodeList vl;
@@ -720,7 +704,7 @@ namespace conedy
 
 		nodeDescriptor outNodeNumber = addStreamOutNode ( s );
 		link ( outNodeNumber, newNodeNumber);
-		inOutNodeList.push_back ( dynamic_cast<dynNode*> ( node::theNodes[outNodeNumber] ));
+		inOutNodeList.push_back ( dynamic_cast<dynNode*> ( dynNode::lookUp(outNodeNumber) ));
 	}
 
 	//void dynNetwork::observePhaseDistance ( string s, nodeBlueprint *n)
@@ -738,11 +722,11 @@ namespace conedy
 
 	void dynNetwork::observeHist ( string fileName,    nodeBlueprint *n)
 	{
-		nodeBlueprint *nod = new  nodeVirtualEdges<streamOutNodeHist>(fileName);
+		nodeBlueprint *nod = new  streamOutNodeHist(fileName);
 		nodeDescriptor streamOutNodeNumber = addNode(nod);
 		network::addEdges ( streamOutNodeNumber, n->getNodeInfo().theNodeType);
 
-		inOutNodeList.push_back ( dynamic_cast<dynNode*> ( nodeBlueprint::theNodes[streamOutNodeNumber] ));
+		inOutNodeList.push_back ( dynamic_cast<dynNode*> ( dynNode::lookUp(streamOutNodeNumber) ));
 
 
 
@@ -768,7 +752,7 @@ namespace conedy
 	//! wie oben. Phasen werden von Edges vom Typ l übergeben.
 	void dynNetwork::observeMeanPhase ( string s, edgeBlueprint *l )
 	{
-		nodeBlueprint *nod = new nodeVirtualEdges <calculateMeanPhase> ();
+		nodeBlueprint *nod = new calculateMeanPhase ();
 		nodeDescriptor newNodeNumber = addNode ( nod );
 		network::addEdges ( newNodeNumber,_dynNode_,l );
 		delete nod;
@@ -783,7 +767,7 @@ namespace conedy
 
 	void dynNetwork::observeEventCounter ( string s, unsigned int signature)
 	{
-		nodeBlueprint* nod = new nodeVirtualEdges <eventCountNode>  (signature);
+		nodeBlueprint* nod = new eventCountNode  (signature);
 		nodeDescriptor newNodeNumber = addNode ( nod );
 		observe ( newNodeNumber, s );
 
@@ -794,13 +778,13 @@ namespace conedy
 	void dynNetwork::observe ( nodeDescriptor number, string s, edgeBlueprint * l )
 	{
 		nodeDescriptor newNodeNumber = addStreamOutNode(s);
-		if (node::theNodes.size()  <= number  || node::theNodes[number] == NULL)
+		if (dynNode::lookUp(number) == NULL)
 			throw "node which should be observed does not exist.";
 		if	(!match (number, _dynNode_))
 			throw "node to be observed is no dynNode.";
 
 		link ( newNodeNumber, number,l );
-		inOutNodeList.push_back ( dynamic_cast<dynNode*> ( nodeBlueprint::theNodes[newNodeNumber] ));
+		inOutNodeList.push_back ( dynamic_cast<dynNode*> ( dynNode::lookUp(newNodeNumber) ));
 
 	}
 
@@ -811,9 +795,9 @@ namespace conedy
 		nodeBlueprint *nod;
 
 		if (getGlobal<bool>("outputBinary"))
-			nod = new nodeVirtualEdges <streamOutNodeBinary > ( s );
+			nod = new streamOutNodeBinary  ( s );
 		else
-			nod = new nodeVirtualEdges <streamOutNode > ( s );
+			nod = new streamOutNode  ( s );
 
 		nodeDescriptor newNodeNumber = addNode ( nod );
 		delete nod;
@@ -831,8 +815,8 @@ namespace conedy
 
 
 
-		if ( node::theNodes[nodeNumber]->getNodeInfo().theNodeKind & _dynNode_ )
-			dynamic_cast<dynNode*>( ( node::theNodes[nodeNumber] ) )->setStateVec(argList);
+		if ( dynNode::lookUp(nodeNumber)->getNodeInfo().theNodeKind & _dynNode_ )
+			dynamic_cast<dynNode*>( ( dynNode::lookUp(nodeNumber) ) )->setStateVec(argList);
 		else
 			throw "Error. Der Knoten ist gar nicht vom Typ Dynnode.";
 
@@ -891,7 +875,7 @@ namespace conedy
 		verticesMatching(vl,n);
 
 		for ( it = vl.begin(); it != vl.end(); it ++)
-			dynamic_cast<dynNode*>( node::theNodes[*it] ) ->randomizeState ( r );
+			dynamic_cast<dynNode*>( dynNode::lookUp(*it) ) ->randomizeState ( r );
 
 
 	}

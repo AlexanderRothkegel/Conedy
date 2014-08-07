@@ -4,6 +4,7 @@ roessler_omega = 0.89;
 roessler_a = 0.165;
 roessler_b = 0.2;
 roessler_c = 10.0;
+outputBinary = true;
 
 samplingTime = 0.01;
 

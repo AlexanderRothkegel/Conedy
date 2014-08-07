@@ -8,7 +8,6 @@
 #include <set>
 #include <vector>
 
-using namespace boost;
 #include "gslNoise.h"
 
 #include "baseType.h"
@@ -56,7 +55,7 @@ namespace conedy
 		public:
 
 			// edges are described by an integer for the source node and an identifier which is defined in node.
-			typedef pair<nodeDescriptor, nodeDescriptor> edgeDescriptor;
+			typedef pair<nodeDescriptor, node::edgeDescriptor> edgeDescriptor;
 
 			//! typedefs for lists of nodes and edges
 			typedef set<nodeDescriptor> nodeList;
@@ -98,7 +97,7 @@ namespace conedy
 			void replaceNode(nodeDescriptor nodeNumber, nodeBlueprint *n = stdNode);
 
 			//! removes all edges between source and target (should be only one)
-			void removeEdge (nodeDescriptor source, nodeDescriptor target) { node::theNodes[source]->unlink(target); }
+			void removeEdge (nodeDescriptor source, nodeDescriptor target) { dynNode::lookUp(source)->unlink(target); }
 	
 			//! remove edge e fromthe network.
 			void removeEdges (edgeBlueprint * e);
@@ -136,7 +135,7 @@ namespace conedy
 			void select (string fileName) ;
 
 			//! returns the number of nodes in the network of kind theNodeKind
-			nodeDescriptor numberVertices ( nodeBlueprint *n = stdNode );
+			unsigned int  numberVertices ( nodeBlueprint *n = stdNode );
 
 
 
@@ -154,7 +153,7 @@ namespace conedy
 
 
 
-			void remove (edgeDescriptor e) { node::theNodes[e.first]-> removeEdge (e.second);}
+			void remove (edgeDescriptor e) { dynNode::lookUp(e.first)-> removeEdge (e.second);}
 
 			//! returns true if the node v is in this network.
 			bool isInsideNetwork ( nodeDescriptor v );
@@ -166,14 +165,14 @@ namespace conedy
 			static nodeDescriptor getSource(edgeDescriptor eD) { return eD.first; }
 
 			//! return the target of the edge.
-			static nodeDescriptor getTarget(edgeDescriptor eD) { return node::theNodes[eD.first]->getTarget(eD.second); }
+			static nodeDescriptor getTarget(edgeDescriptor eD) { return dynNode::lookUp(eD.first)->getTarget(eD.second); }
 
 			//! returns the target of the edge.
-			nodeDescriptor getTarget(nodeDescriptor source,  nodeDescriptor edgeNumber)		{ return node::theNodes[source]->getTarget(edgeNumber); }
+			nodeDescriptor getTarget(nodeDescriptor source,  nodeDescriptor edgeNumber)		{ return dynNode::lookUp(source)->getTarget(edgeNumber); }
 
-			baseType getWeight(edgeDescriptor eD) { return node::theNodes[eD.first]->getWeight(eD.second); }
+			baseType getWeight(edgeDescriptor eD) { return dynNode::lookUp(eD.first)->getWeight(eD.second); }
 
-			void setWeight(edgeDescriptor eD, baseType w) { 		 node::theNodes[eD.first]->setWeight(eD.second, w); }
+			void setWeight(edgeDescriptor eD, baseType w) { 		 dynNode::lookUp(eD.first)->setWeight(eD.second, w); }
 
 
 
@@ -181,10 +180,10 @@ namespace conedy
 			virtual void clean ();
 
 			//! obsolete ?
-			edgeInfo getEdgeInfo (edgeDescriptor eD) 		 { return node::theNodes[eD.first]->getEdgeInfo(eD.second);}
+			edgeInfo getEdgeInfo (edgeDescriptor eD) 		 { return dynNode::lookUp(eD.first)->getEdgeInfo(eD.second);}
 
 			//! obsolete ?
-			edge * getEdge (edgeDescriptor eD) 				 { return node::theNodes [eD.first]->getEdge(eD.second); }
+			edgeBlueprint * getEdgeBlueprint(edgeDescriptor eD) 				 { return dynNode::lookUp(eD.first)->getEdgeBlueprint(eD.second); }
 
 
 
@@ -226,7 +225,7 @@ namespace conedy
 			void addEdges(nodeDescriptor source, nodeDescriptor target, edgeBlueprint *l);
 			void addEdges (nodeDescriptor source, nodeKind targetNodeKind, edgeBlueprint *l = stdEdge);
 			//! Verbindet Knoten source mit allen Knoten vom Typ targetNodeType
-			void addEdges (nodeDescriptor source, int targetNodeType, edgeBlueprint *l = stdEdge);
+			void addEdges (nodeDescriptor source, networkElementType targetNodeType, edgeBlueprint *l = stdEdge);
 			void addEdges (nodeKind sourceNodeKind, nodeDescriptor targetNode, edgeBlueprint *l = stdEdge);
 
 
@@ -246,7 +245,7 @@ namespace conedy
 			unsigned int randomNode(nodeKind nodeKind = _dynNode_);
 
 
-			int getNodeKind ( int number ) { return node::theNodes[number]->getNodeInfo().theNodeKind; }
+			int getNodeKind ( int number ) { return dynNode::lookUp(number)->getNodeInfo().theNodeKind; }
 
 
 			//! Contains all nodes with time evolution

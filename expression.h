@@ -7,7 +7,7 @@
 #include "dynNode.h"
 
 using namespace boost;
-
+using namespace conedy;
 
 template <typename T>
 class expression : public instruction

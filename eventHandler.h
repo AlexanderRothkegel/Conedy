@@ -35,7 +35,6 @@
 
 
 using namespace std;
-using namespace boost;
 //#include "dynNode.h"
 
 
@@ -62,7 +61,7 @@ class eventHandler;
 typedef calendarQueue priorityQueueTemplate;
 #else
 #include <boost/pending/relaxed_heap.hpp>
-typedef relaxed_heap < int, compareEventTimes> priorityQueueTemplate ;
+typedef boost::relaxed_heap < int, compareEventTimes> priorityQueueTemplate ;
 #endif
 
 
@@ -133,10 +132,10 @@ class eventHandler
 
 
 	//! Fügt eine Funktion ein, die jeweils direkt vor dem eigentlichen callback von event eventNumber aufgerufen wird.
-	static void insertVisiter(function <void()> v, unsigned int eventNumber);
+	static void insertVisiter(boost::function <void()> v, unsigned int eventNumber);
 
 	//! Fügt eine Funktion ein, die vor jedem Event mit der Signature signature aufgerufen wird.
-	static void insertVisiterAtSignature (function <void()> v, unsigned int signature);
+	static void insertVisiterAtSignature (boost::function <void()> v, unsigned int signature);
 
 	double priority (const unsigned int i) const { return eventList[i].time;}
 
@@ -219,7 +218,7 @@ class eventHandler
 			boost::function <void()> visit;
 			eventHandler *target;
 			public:
-			visiter( function <void()> v, eventHandler *t) : visit(v), target(t) {}; 
+			visiter( boost::function <void()> v, eventHandler *t) : visit(v), target(t) {}; 
 			virtual baseType callBack ( unsigned int eventSignature ) { 
 				double res = target->callBack(eventSignature);
 				visit();

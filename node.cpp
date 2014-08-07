@@ -4,11 +4,11 @@
 #include "edge.h"
 
 #include "gslNoise.h"
-
+#include "dynNode.h"
 namespace conedy
 {
 
-	 baseType edge::getTargetState() { return node::theNodes[targetNumber]->getState(); }
+	 baseType edge::getTargetState() { return dynNode::lookUp(targetNumber)->getState(); }
 
 	node::node () { number = numeric_limits<nodeDescriptor>::max(); };
 
@@ -19,18 +19,16 @@ namespace conedy
 
 	vector<node *> node::theNodes;
 
-	baseType edgeVirtual::getTargetState() { return node::theNodes[getTarget()]->getState();}
+	baseType edgeVirtual::getTargetState() { return dynNode::lookUp(getTarget())->getState();}
 //	inline node* edge::getTarget() { return node::theNodes [targetNumber];}
 
 
 
-
-
-	ostream& edge::printStatistics( ostream &os, int edgeVerbosity, int theEdgeKind, string theEdgeName, baseType weight)
+	ostream& edgeVirtual::printStatistics( ostream &os, int edgeVerbosity, int theEdgeKind, string theEdgeName, baseType weight)
 			{
 				if (edgeVerbosity >= 1)
 				{
-					os << node::theNodes[targetNumber]->getNumber() << "\t";
+					os << dynNode::lookUp(targetNumber)->getNumber() << "\t";
 				}
 				// Ausgabe Kind, Name
 				if (edgeVerbosity >= 2)
@@ -55,9 +53,44 @@ namespace conedy
 	        ostream& edgeVirtual::printStatistics ( ostream &os, int edgeVerbosity)
 			{
 				edgeInfo ei = getEdgeInfo();
-				edge::printStatistics(os, edgeVerbosity, ei.theEdgeKind, ei.theEdgeName,  getWeight());
+				printStatistics(os, edgeVerbosity, ei.theEdgeKind, ei.theEdgeName,  getWeight());
 				return os;
 			}
+
+
+
+	ostream& edge::printStatistics( ostream &os, int edgeVerbosity, int theEdgeKind, string theEdgeName, baseType weight)
+			{
+				if (edgeVerbosity >= 1)
+				{
+					os << dynNode::lookUp(targetNumber)->getNumber() << "\t";
+				}
+				// Ausgabe Kind, Name
+				if (edgeVerbosity >= 2)
+				{
+				  	cout << "(";
+
+				edgeInfo ei = getEdgeInfo();
+
+//					os << "EdgeKind = " << theEdgeKind << "\t";
+					os << theEdgeName << ", ";
+
+				// Ausgabe Gewicht
+					os << weight;
+				}
+				if (edgeVerbosity >= 2)
+					os <<  "), ";
+				return os;
+			};
+
+
+
+//	        ostream& edgeVirtual::printStatistics ( ostream &os, int edgeVerbosity)
+//			{
+//				edgeInfo ei = getEdgeInfo();
+//				edge::printStatistics(os, edgeVerbosity, ei.theEdgeKind, ei.theEdgeName,  getWeight());
+//				return os;
+//			}
 
 	void node::printEdgeStatistics(ostream &os, int edgeVerbosity)
 	{
@@ -97,10 +130,10 @@ namespace conedy
 
 
 	bool match (nodeDescriptor l, nodeDescriptor r) { return l == r; };	
-	bool match (nodeKind l, nodeDescriptor r) { return node::theNodes[r]-> getNodeInfo().theNodeKind & l;  };	
-	bool match (nodeDescriptor l, nodeKind r) { return node::theNodes[l]-> getNodeInfo().theNodeKind & r;  };	
-	bool match (nodeDescriptor l, networkElementType r) { return node::theNodes[l]->getNodeInfo().theNodeType == r; };	
-	bool match (networkElementType l, nodeDescriptor r) { return node::theNodes[r]->getNodeInfo().theNodeType == l;  };	
+	bool match (nodeKind l, nodeDescriptor r) { return dynNode::lookUp(r)-> getNodeInfo().theNodeKind & l;  };	
+	bool match (nodeDescriptor l, nodeKind r) { return dynNode::lookUp(l)-> getNodeInfo().theNodeKind & r;  };	
+	bool match (nodeDescriptor l, networkElementType r) { return dynNode::lookUp(l)->getNodeInfo().theNodeType == r; };	
+	bool match (networkElementType l, nodeDescriptor r) { return dynNode::lookUp(r)->getNodeInfo().theNodeType == l;  };	
 
 
 

@@ -46,7 +46,6 @@ void printDefines ()
 	cout << "CALENDARQUEUE ";
 #endif
 
-
 #if DEBUG
 	cout << "DEBUG "; 
 #endif

@@ -159,6 +159,7 @@ class vectorForInstruction : public instruction, private globals
 		static void registerStandardValues() {
 			registerGlobal<bool>("LINUX_x86_64", false);
 			registerGlobal<bool>("LINUX_x86", false);
+			registerGlobal<bool>("LINUX_i686", false);
 			registerGlobal<bool>("WINNT51_x86", false);
 			registerGlobal<bool>("WINNT60_x86", false);
 			registerGlobal<bool>("WINNT61_x86", false);

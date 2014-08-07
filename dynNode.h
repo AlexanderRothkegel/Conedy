@@ -31,51 +31,38 @@ namespace conedy
 {
 	//! Interface für die dynamischen Eigenschaften (Zeitentwicklung) der Knoten.
 	class dynNode : public node, public params<baseType>
-
 	{
-		protected:
 		public:
 
-			baseType *  x;
 
 			static dynNode* lookUp (nodeDescriptor n);
-
-
-			virtual const nodeInfo getNodeInfo() { nodeInfo n = {_dynNodeNodeType_,_dynNode_,"dynNode"};  return n;};
-
-
-			//			static gslNoise random;
-
 			static baseType startTime;
 			static baseType time;
 			static baseType endTime;
 
-			dynNode ( networkElementType n) : params<baseType>( n ) {}
-
+			virtual const nodeInfo getNodeInfo() { nodeInfo n = {_dynNodeNodeType_,_dynNode_,"dynNode"};  return n;};
+			dynNode (networkElementType n) : params<baseType>( n ) {}
 			dynNode (networkElementType n, unsigned int dim);
-
 			dynNode () : params <baseType> (_dynNodeNodeType_) {}
 
-			virtual void evolve(baseType time) { cerr << this->getNodeInfo().theNodeName << endl; throw "evolve of dynNode called";}
+			virtual void evolve(baseType time) { throw "evolve of dynNode called!";}
 			virtual bool timeEvolution () { return 0; };
+			
+			virtual void upkeep() { }
 			virtual bool requiresUpkeep() { return 0; };
+
 			virtual const unsigned int dimension () const { return 0; }
 
-			virtual baseType getHiddenComponent ( int component ) {return x[component];}
-			virtual baseType getState() { return this->getState(0);  }
+			virtual baseType getState() { return x[0]; }
+			virtual baseType getState (unsigned int component) { return x[component];}
 
-			virtual void upkeep() { }
 
-			//	throw "upkeep of dynNode called";
 
 			virtual node * construct () { throw "construct of dynNode called !"; }
 
 			virtual void printStatistics(ostream &os, int nodeVerbosity, int edgeVerbosity);
 
-			virtual void dynamics() { throw "dynamics of dynNode called !"; }
 
-			virtual  baseType getMeanPhaseCoherence() { throw "getMeanPhaseCoherence";}
-			virtual	baseType couplingSum() { throw "couplingSum"; }
 			virtual	void fire () { throw "fire"; }
 
 
@@ -88,13 +75,13 @@ namespace conedy
 
 			virtual void randomizeState ( vector <boost::function<baseType () > > &r );
 
-			virtual baseType getState (unsigned int component) { return x[component];}
 
 
-			void setState(  baseType a1, baseType a2 = numeric_limits<baseType>::max(), baseType a3 = numeric_limits<baseType>::max(), baseType a4 = numeric_limits<baseType>::max(), baseType a5 = numeric_limits<baseType>::max(), baseType a6 = numeric_limits<baseType>::max(), baseType a7 = numeric_limits<baseType>::max(), baseType a8 = numeric_limits<baseType>::max(), baseType a9 = numeric_limits<baseType>::max(), baseType a10 = numeric_limits<baseType>::max(), baseType a11 = numeric_limits<baseType>::max(), baseType a12 = numeric_limits<baseType>::max());
+			void setState(baseType a1, baseType a2 = numeric_limits<baseType>::max(), baseType a3 = numeric_limits<baseType>::max(), baseType a4 = numeric_limits<baseType>::max(), baseType a5 = numeric_limits<baseType>::max(), baseType a6 = numeric_limits<baseType>::max(), baseType a7 = numeric_limits<baseType>::max(), baseType a8 = numeric_limits<baseType>::max(), baseType a9 = numeric_limits<baseType>::max(), baseType a10 = numeric_limits<baseType>::max(), baseType a11 = numeric_limits<baseType>::max(), baseType a12 = numeric_limits<baseType>::max());
 
+		protected:
 
-
+			baseType *  x;
 
 
 	};

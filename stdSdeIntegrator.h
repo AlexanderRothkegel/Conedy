@@ -13,67 +13,67 @@ namespace conedy {
 	class stdSdeIntegrator : public sdeNode, private globals
 	{
 		public:
-				sdeIntegrator *integ;
+			sdeIntegrator *integ;
 
-		stdSdeIntegrator (networkElementType n, unsigned int dim) : sdeNode (n, dim)    {}
+			stdSdeIntegrator (networkElementType n, unsigned int dim) : sdeNode (n, dim)    {}
 
-		stdSdeIntegrator ( const stdSdeIntegrator &b ): sdeNode (b) {}
+			stdSdeIntegrator ( const stdSdeIntegrator &b ): sdeNode (b) {}
 
-		static unsigned int stepType_int;
+			static unsigned int stepType_int;
 
-		static void registerStandardValues()
-		{
-			registerGlobal<string>("sdeStepType", "euler");
-		}
-
-
-//		virtual void swap(short i) { state=x[i]; }
-		virtual void clean() {
-
-	if (amIFirst())
-	{
-			string stepType = getGlobal<string>("sdeStepType");
-
-			if (stepType == "euler")
+			static void registerStandardValues()
 			{
-				integ = new eulerMaruyama (containerDimension() );
-				stepType_int = 0;
-			}
-			else if (stepType == "milsteinIto")
-			{
-				integ = new milsteinIto (containerDimension() );
-				stepType_int = 1;
-			}
-			else if (stepType == "milsteinStrato")
-			{
-				integ = new milsteinStrato (containerDimension() );
-				stepType_int = 2;
+				registerGlobal<string>("sdeStepType", "euler");
 			}
 
-			else
-				throw "unknown steptype for SDE Integrator!";
-	}
-	};
+
+			//		virtual void swap(short i) { state=x[i]; }
+			virtual void clean() {
+
+				if (amIFirst())
+				{
+					string stepType = getGlobal<string>("sdeStepType");
+
+					if (stepType == "euler")
+					{
+						integ = new eulerMaruyama (containerDimension() );
+						stepType_int = 0;
+					}
+					else if (stepType == "milsteinIto")
+					{
+						integ = new milsteinIto (containerDimension() );
+						stepType_int = 1;
+					}
+					else if (stepType == "milsteinStrato")
+					{
+						integ = new milsteinStrato (containerDimension() );
+						stepType_int = 2;
+					}
+
+					else
+						throw "unknown steptype for SDE Integrator!";
+				}
+			};
 
 
 
-// RUNGE KUTTA No. 4
-		virtual void evolve(baseType time)
-		{
-			switch (stepType_int)
+			// RUNGE KUTTA No. 4
+			virtual void evolve(baseType time)
 			{
-				case 0:
-					((eulerMaruyama *) integ)->step (time, dynamicVariablesOfAllDynNodes, *this, containerDimension());
-					break;
-				case 1:
-					((milsteinIto *) integ)->step (time, dynamicVariablesOfAllDynNodes, *this, containerDimension());
-					break;
-				case 2:
-					((milsteinStrato *) integ)->step (time, dynamicVariablesOfAllDynNodes, *this, containerDimension());
-					break;
-			}
+				switch (stepType_int)
+				{
+					case 0:
+						((eulerMaruyama *) integ)->step (time, dynamicVariablesOfAllDynNodes, *this, containerDimension());
+						break;
+					case 1:
+						((milsteinIto *) integ)->step (time, dynamicVariablesOfAllDynNodes, *this, containerDimension());
+						break;
+					case 2:
+						((milsteinStrato *) integ)->step (time, dynamicVariablesOfAllDynNodes, *this, containerDimension());
+						break;
+				}
 
-		}
+			}
 
 
 
@@ -85,7 +85,7 @@ namespace conedy {
 	typedef stdSdeIntegrator sde;
 
 
-//	typedef odeNode stdSdeIntegrator;   // Runge-Kutta Ord4
+	//	typedef odeNode stdSdeIntegrator;   // Runge-Kutta Ord4
 
 }
 

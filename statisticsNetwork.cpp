@@ -47,10 +47,10 @@ namespace conedy
 		for ( ia = vl.begin(); ia != vl.end(); ia++ )
 		{
 			ea = 0;
-			ee = node::theNodes[*ia] ->degree();
+			ee = dynNode::lookUp(*ia) ->degree();
 
 			for ( ; ea != ee; ea++ )
-				if (node::theNodes[(*ia)] ->getTarget(ea) == n)
+				if (dynNode::lookUp((*ia)) ->getTarget(ea) == n)
 					res++;
 
 		}
@@ -106,7 +106,7 @@ namespace conedy
 
 		for (it = vl.begin(); it != vl.end(); it++)
 		{
-			node::theNodes[ *it] ->printStatistics(cout, getGlobal<int>("nodeVerbosity"), getGlobal<int>("edgeVerbosity"));
+			dynNode::lookUp( *it) ->printStatistics(cout, getGlobal<int>("nodeVerbosity"), getGlobal<int>("edgeVerbosity"));
 			cout << endl;
 		}
 	}
@@ -145,9 +145,9 @@ namespace conedy
 			for( i=0; i<Sub.size(); i++)
 			{
 				v = Sub[i]-1;
-				for( node::edgeDescriptor l=0; l<node::theNodes[v]->degree() ; l++)
+				for( node::edgeDescriptor l=0; l<dynNode::lookUp(v)->degree() ; l++)
 				{
-					t = node::theNodes[v]->getTarget(l);
+					t = dynNode::lookUp(v)->getTarget(l);
 					if (connect[ t - *vl.begin()] == 0)
 					{
 						connect[ t - *vl.begin() ] = 1;
@@ -172,7 +172,7 @@ namespace conedy
 		network::nodeList vl;
 		network::verticesMatching ( vl,_dynNode_ );
 		for ( ia = vl.begin(); ia != vl.end(); ia++ )
-			f = f +node::theNodes[*ia] ->degree();
+			f = f +dynNode::lookUp(*ia) ->degree();
 		f = f / network::numberVertices();
 		return f;
 	}
@@ -210,7 +210,7 @@ namespace conedy
 		for ( ia = vl.begin(); ia != vl.end(); ia++ )
 
 		{
-			deg = node::theNodes[*ia]->degree();
+			deg = dynNode::lookUp(*ia)->degree();
 
 
 			if ( deg +1 > ( res.size() ) )
@@ -242,10 +242,10 @@ namespace conedy
 		for ( ia = vl.begin(); ia != vl.end(); ia++ )
 		{
 			ea = 0;
-			ee = node::theNodes[*ia] ->degree();
+			ee = dynNode::lookUp(*ia) ->degree();
 
 			for ( ; ea != ee; ea++ )
-				inDegree[node::theNodes[(*ia)] ->getTarget(ea)] ++;
+				inDegree[dynNode::lookUp((*ia)) ->getTarget(ea)] ++;
 		}
 
 
@@ -302,7 +302,7 @@ namespace conedy
 
 		ofstream out (filename.c_str() );
 		for( it = vl.begin(); it != vl.end(); it++)
-			out << node::theNodes[*it]->degree() <<endl;
+			out << dynNode::lookUp(*it)->degree() <<endl;
 
 		out.close();
 	}
@@ -334,10 +334,10 @@ namespace conedy
 			j = theQueue.top()-1 +*vl.begin();
 			theQueue.pop();
 
-			for (node::edgeDescriptor l=0 ; l < node::theNodes[j]->degree() ; l++ )
+			for (node::edgeDescriptor l=0 ; l < dynNode::lookUp(j)->degree() ; l++ )
 			{
-				k = node::theNodes[j]->getTarget(l); // alle Nachbarn k von j
-				d = 1/(node::theNodes[j]->getWeight(l)); // d misst die Entfernung zwischen k und j
+				k = dynNode::lookUp(j)->getTarget(l); // alle Nachbarn k von j
+				d = 1/(dynNode::lookUp(j)->getWeight(l)); // d misst die Entfernung zwischen k und j
 
 				if ( (dC.weightMap[ j-*vl.begin() ] + d) < dC.weightMap[ k-*vl.begin() ]  &&  dC.weightMap[ k-*vl.begin() ] == numeric_limits<baseType>::infinity() )
 				{
@@ -476,10 +476,10 @@ namespace conedy
 
 				S.push_back( v+1 -*vl.begin() );
 
-				for ( node::edgeDescriptor l=0 ; l<node::theNodes[v]->degree() ; l++ ) //weightMap aktualisieren
+				for ( node::edgeDescriptor l=0 ; l<dynNode::lookUp(v)->degree() ; l++ ) //weightMap aktualisieren
 				{
-					w = node::theNodes[v]->getTarget(l); // alle Nachbarn w von v
-					d = 1/( node::theNodes[v]->getWeight(l) ); // d misst die Entfernung zwischen w und v
+					w = dynNode::lookUp(v)->getTarget(l); // alle Nachbarn w von v
+					d = 1/( dynNode::lookUp(v)->getWeight(l) ); // d misst die Entfernung zwischen w und v
 
 					if ( dC.weightMap[w -*vl.begin()] == numeric_limits<baseType>::infinity() ) // zum ersten Mal entdeckt?
 					{
@@ -494,10 +494,10 @@ namespace conedy
 					}
 				}
 
-				for ( node::edgeDescriptor l=0 ; l<node::theNodes[v]->degree() ; l++ ) // Prezedessoren checken
+				for ( node::edgeDescriptor l=0 ; l<dynNode::lookUp(v)->degree() ; l++ ) // Prezedessoren checken
 				{
-					w = node::theNodes[v]->getTarget(l); // alle Nachbarn w von v
-					d = 1/( node::theNodes[v]->getWeight(l) ); // d misst die Entfernung zw w und v
+					w = dynNode::lookUp(v)->getTarget(l); // alle Nachbarn w von v
+					d = 1/( dynNode::lookUp(v)->getWeight(l) ); // d misst die Entfernung zw w und v
 
 					// hier soll auf gleichheit kontrolliert werden...
 					if ( dC.weightMap[v -*vl.begin()] == dC.weightMap[w -*vl.begin()] + d ) // kürzester Weg nach v via w?
@@ -589,9 +589,9 @@ namespace conedy
 		out << vl.size() << "\n";
 
 		for( it = vl.begin(); it != vl.end(); it++)
-			for( node::edgeDescriptor l=0; l<node::theNodes[*it]->degree() ;l++)
+			for( node::edgeDescriptor l=0; l<dynNode::lookUp(*it)->degree() ;l++)
 				if (isInsideNetwork(   getTarget (*it, l)	))
-					out << *it <<' '<< node::theNodes[*it]->getTarget(l) <<' '<< node::theNodes[*it]->getWeight(l) <<"\n";
+					out << *it <<' '<< dynNode::lookUp(*it)->getTarget(l) <<' '<< dynNode::lookUp(*it)->getWeight(l) <<"\n";
 
 
 		out.close();
@@ -601,41 +601,42 @@ namespace conedy
 	void statisticsNetwork::printAdjacencyList()
 	{
 
-		node::edgeDescriptor ea, ee;
-
-
-		//			out << "#source target weight\n";
-		cout << node::theNodes.size()  << "\n";
-
-		for (unsigned int i = 0; i < node::theNodes.size(); i++)
-		{
-
-
-			ea = 0;
-			ee = node::theNodes[i] ->degree();
-
-
-			for (; ea != ee; ea++)
-			{
-				// Ausgabe der Nodenummer:
-				cout << i << " ";
-
-				//Ausgabe der jeweiligen Edge
-				//				node::theNodes[i]->getEdge(ea)->printStatistics(cout,  network::edgeVerbosity());
 				throw "statisticsNetwork::printAdjacencyList. repair me!";
-				// ENDE
-				cout << endl;
-				/*
-					cout << i << " "<<(*ea)->target->getNumber() << " ";
-					if ((*ea)->getEdgeInfo().theEdgeKind & _weighted_)
-					cout << ((weightedEdge*)(*ea))->getWeight() << "\n";
-					else
-					cout << "\n";
-					*/
-
-			}
-		}
-
+//		node::edgeDescriptor ea, ee;
+//
+//
+//		//			out << "#source target weight\n";
+//		cout << node::theNodes.size()  << "\n";
+//
+//		for (unsigned int i = 0; i < node::theNodes.size(); i++)
+//		{
+//
+//
+//			ea = 0;
+//			ee = dynNode::lookUp(i) ->degree();
+//
+//
+//			for (; ea != ee; ea++)
+//			{
+//				// Ausgabe der Nodenummer:
+//				cout << i << " ";
+//
+//				//Ausgabe der jeweiligen Edge
+//				//				dynNode::lookUp(i)->getEdge(ea)->printStatistics(cout,  network::edgeVerbosity());
+//				throw "statisticsNetwork::printAdjacencyList. repair me!";
+//				// ENDE
+//				cout << endl;
+//				/*
+//					cout << i << " "<<(*ea)->target->getNumber() << " ";
+//					if ((*ea)->getEdgeInfo().theEdgeKind & _weighted_)
+//					cout << ((weightedEdge*)(*ea))->getWeight() << "\n";
+//					else
+//					cout << "\n";
+//					*/
+//
+//			}
+//		}
+//
 	}
 
 
@@ -664,21 +665,23 @@ namespace conedy
 		out << '\t' << "<graph id=\"Graph\" edgedefault=\"directed\">\n";
 
 		// Erstelle nodes in Datei:
+		nodeList vl;
+		verticesMatching (vl, _dynNode_);
 
-		for (unsigned int i = 0; i < node::theNodes.size(); i++)
+		for (nodeIterator it = vl.begin(); it != vl.end(); ++it)
 		{
-			out << '\t' << '\t' << "<node id=\"n"<< i << "\"/>\n";
+			out << '\t' << '\t' << "<node id=\"n"<< *it << "\"/>\n";
 		}
 
 		// Erstelle edges in Datei:
-		for (unsigned int i = 0; i < node::theNodes.size(); i++)
+		for (nodeIterator it = vl.begin(); it != vl.end(); ++it)
 		{
 
 			ea = 0;
-			ee = node::theNodes[i]->degree();
+			ee = dynNode::lookUp(*it)->degree();
 
 			for (; ea != ee; ea++, edge++)
-				out << '\t' << '\t' << "<edge id=\"e"<< edge << "\"\tsource=\"n" << i << '\"' << "\ttarget =\"n" << node::theNodes[i]->getTarget(ea) << "\"/>\n";
+				out << '\t' << '\t' << "<edge id=\"e"<< edge << "\"\tsource=\"n" << *it << '\"' << "\ttarget =\"n" << dynNode::lookUp(*it)->getTarget(ea) << "\"/>\n";
 		}
 
 		// Ausgabe footer

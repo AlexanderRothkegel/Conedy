@@ -62,7 +62,7 @@ namespace conedy
 			ostream& printStatistics ( ostream &os, int edgeVerbosity)
 			{
 				edgeInfo ei = getEdgeInfo();
-				edge::printStatistics(os, edgeVerbosity, ei.theEdgeKind, ei.theEdgeName,  getWeight());
+				EDGE::printStatistics(os, edgeVerbosity, ei.theEdgeKind, ei.theEdgeName,  getWeight());
 				return os;
 			}
 
@@ -97,7 +97,7 @@ namespace conedy
 			ostream& printStatistics ( ostream &os, int edgeVerbosity)
 			{
 				edgeInfo ei = getEdgeInfo();
-				edge::printStatistics(os, edgeVerbosity, ei.theEdgeKind, ei.theEdgeName,  getWeight());
+				EDGE::printStatistics(os, edgeVerbosity, ei.theEdgeKind, ei.theEdgeName,  getWeight());
 				return os;
 			}
 
@@ -136,7 +136,7 @@ namespace conedy
 
 		baseType getTargetState()
 		{
-			return (  (dynNode*)  ( node::theNodes[EDGE::getTarget()] ) ) ->getState(which)   ;
+			return (  (dynNode*)  ( dynNode::lookUp(EDGE::getTarget()) ) ) ->getState(which)   ;
 
 		}
 		edgeVirtual *construct() {
@@ -181,7 +181,7 @@ namespace conedy
 		public:
 			const edgeInfo getEdgeInfo() {
 				edgeInfo ancestor = EDGE::getEdgeInfo();
-				edgeInfo ei = {_randomTarget_, (char) ( _weighted_ | ancestor.theEdgeKind) ,  ancestor.theEdgeName + "_randomTarget"};  return ei;
+				edgeInfo ei = {_randomTarget_, (edgeKind) ( _weighted_ | ancestor.theEdgeKind) ,  ancestor.theEdgeName + "_randomTarget"};  return ei;
 			}
 
 
@@ -223,7 +223,7 @@ namespace conedy
 		stepEdge ( ){};
 		const edgeInfo getEdgeInfo() {
 			edgeInfo ancestor = EDGE::getEdgeInfo();
-			edgeInfo ei = {_pulseCouple_,(char)( _weighted_ | ancestor.theEdgeKind),  ancestor.theEdgeName + "_step"};  return ei;}
+			edgeInfo ei = {_pulseCouple_,(edgeKind)( _weighted_ | ancestor.theEdgeKind),  ancestor.theEdgeName + "_step"};  return ei;}
 			void setParameter(vector < baseType > parameter)
 			{
 				EDGE::setParameter(parameter);
@@ -256,7 +256,8 @@ namespace conedy
 			ostream& printStatistics ( ostream &os, int edgeVerbosity)
 			{
 				edgeInfo ei = getEdgeInfo();
-				edge::printStatistics(os, edgeVerbosity, ei.theEdgeKind, ei.theEdgeName,  EDGE::getWeight());
+//				EDGE::printStatistics(os, edgeVerbosity, ei.theEdgeKind, ei.theEdgeName,  EDGE::getWeight());
+				EDGE::printStatistics(os, edgeVerbosity);
 				return os;
 			}
 
@@ -291,7 +292,7 @@ namespace conedy
 
 		baseType getTargetState()
 		{
-			return (  (dynNode*)  (node::theNodes[ EDGE::getTarget()] ) ) ->getState(which)   ;
+			return (   (dynNode::lookUp( EDGE::getTarget()) ) ) ->getState(which)   ;
 
 		}
 		edgeVirtual *construct() {
@@ -304,107 +305,107 @@ namespace conedy
 
 	};
 
-	//! Edge mit Pulsekopplung und delay
-	class pulsecoupleDelayEdge: public weightedEdgeVirtual
-	{
-		double threshold;
-		int nextFiring;
-		int timeDelay;
-		public:
-		pulsecoupleDelayEdge ( double th, double tD ) : threshold ( th ), timeDelay ( tD )  {};
-		const edgeInfo getEdgeInfo() {edgeInfo ei = {_pulsecoupleDelayEdge_,_weighted_}; return ei;}
-		baseType getTargetState()
-		{
-			if ( nextFiring == 0 )
-			{
-				if ( weightedEdgeVirtual::getTargetState() >= threshold )
-					nextFiring = timeDelay;
-				return 0;
-			}
-			else
-			{
-				if ( nextFiring == 1 )
-				{
-					nextFiring--;
-					return this->getWeight();
-				}
-				else
-				{
-					nextFiring--;
-					return 0;
-				}
-			}
-		}
-		edgeVirtual *construct() { return new pulsecoupleDelayEdge ( *this ); };
-
-
-		/* void printStatistics()
-			{
-			cout << "(pulsecoupleDelayEdge,";
-			weightedEdgeVirtual<baseType>::printStatistics();
-			}*/
-
-		// Überladung des Ausgabestreams
-		//
-		//
-
-		ostream& printStatistics ( ostream &os, int edgeVerbosity)
-		{
-			edgeInfo ei = getEdgeInfo();
-			edge::printStatistics(os, edgeVerbosity, ei.theEdgeKind, ei.theEdgeName,  getWeight());
-			return os;
-		}
-	};
-
-
-
-
-	//! Edge mit Delay
-	class delayEdge : public weightedEdgeVirtual
-	{
-		vector <baseType> memory;
-		int delay;
-		int counter;
-
-		public:
-
-		const edgeInfo getEdgeInfo() {edgeInfo ei = {_delayEdge_,_weighted_}; return ei;}
-		delayEdge ( int d ) : memory ( d+1 ), delay ( d ), counter ( 0 ) {};
-		baseType getTargetState()
-		{
-			memory[counter] = weightedEdgeVirtual::getTargetState();
-			counter++;
-			if ( counter == delay +1 )
-				counter = 0;
-			return memory[counter];
-		}
-		edgeVirtual *construct() { return new delayEdge ( *this ); };
-
-		// Überladung des Ausgabestreams
-		ostream& printStatistics ( ostream &os, int edgeVerbosity)
-		{
-			// Ausgabe Header:
-			//
-			//
-			//
-			edgeInfo ei = getEdgeInfo();
-			edge::printStatistics(os, edgeVerbosity, ei.theEdgeKind, ei.theEdgeName,  getWeight());
-
-			if (edgeVerbosity>=2)
-			{
-				os << "delay = " << delay << "\t";
-				os << "counter = " << counter << "\t";
-				os << "size(memory) = " << memory.size() << "\t";
-			}
-
-
-			// Ausgabe Gewicht
-			os << this->getWeight();
-
-			return os;
-		}
-	};
-
+//	//! Edge mit Pulsekopplung und delay
+//	class pulsecoupleDelayEdge: public weightedEdgeVirtual
+//	{
+//		double threshold;
+//		int nextFiring;
+//		int timeDelay;
+//		public:
+//		pulsecoupleDelayEdge ( double th, double tD ) : threshold ( th ), timeDelay ( tD )  {};
+//		const edgeInfo getEdgeInfo() {edgeInfo ei = {_pulsecoupleDelayEdge_,_weighted_}; return ei;}
+//		baseType getTargetState()
+//		{
+//			if ( nextFiring == 0 )
+//			{
+//				if ( weightedEdgeVirtual::getTargetState() >= threshold )
+//					nextFiring = timeDelay;
+//				return 0;
+//			}
+//			else
+//			{
+//				if ( nextFiring == 1 )
+//				{
+//					nextFiring--;
+//					return this->getWeight();
+//				}
+//				else
+//				{
+//					nextFiring--;
+//					return 0;
+//				}
+//			}
+//		}
+//		edgeVirtual *construct() { return new pulsecoupleDelayEdge ( *this ); };
+//
+//
+//		/* void printStatistics()
+//			{
+//			cout << "(pulsecoupleDelayEdge,";
+//			weightedEdgeVirtual<baseType>::printStatistics();
+//			}*/
+//
+//		// Überladung des Ausgabestreams
+//		//
+//		//
+//
+//		ostream& printStatistics ( ostream &os, int edgeVerbosity)
+//		{
+//			edgeInfo ei = getEdgeInfo();
+//			edgeVirtual::printStatistics(os, edgeVerbosity, ei.theEdgeKind, ei.theEdgeName,  getWeight());
+//			return os;
+//		}
+//	};
+//
+//
+//
+//
+//	//! Edge mit Delay
+//	class delayEdge : public weightedEdgeVirtual
+//	{
+//		vector <baseType> memory;
+//		int delay;
+//		int counter;
+//
+//		public:
+//
+//		const edgeInfo getEdgeInfo() {edgeInfo ei = {_delayEdge_,_weighted_}; return ei;}
+//		delayEdge ( int d ) : memory ( d+1 ), delay ( d ), counter ( 0 ) {};
+//		baseType getTargetState()
+//		{
+//			memory[counter] = weightedEdgeVirtual::getTargetState();
+//			counter++;
+//			if ( counter == delay +1 )
+//				counter = 0;
+//			return memory[counter];
+//		}
+//		edgeVirtual *construct() { return new delayEdge ( *this ); };
+//
+//		// Überladung des Ausgabestreams
+//		ostream& printStatistics ( ostream &os, int edgeVerbosity)
+//		{
+//			// Ausgabe Header:
+//			//
+//			//
+//			//
+//			edgeInfo ei = getEdgeInfo();
+//			edge::printStatistics(os, edgeVerbosity, ei.theEdgeKind, ei.theEdgeName,  getWeight());
+//
+//			if (edgeVerbosity>=2)
+//			{
+//				os << "delay = " << delay << "\t";
+//				os << "counter = " << counter << "\t";
+//				os << "size(memory) = " << memory.size() << "\t";
+//			}
+//
+//
+//			// Ausgabe Gewicht
+//			os << this->getWeight();
+//
+//			return os;
+//		}
+//	};
+//
 
 	}
 

@@ -22,6 +22,8 @@
 // this is generally the application path
 
 using namespace std;
+using namespace conedy;
+
 
 map < string, int > command::varType;
 map < string, baseType* > command::baseTypeVar;
@@ -95,7 +97,7 @@ void command::clear()
 
 {
 
-	node::theNodes.clear();
+//	node::theNodes.clear();
 	containerNode<baseType,1>::clear();
 	containerNode<baseType,2>::clear();
 	containerNode<baseType,3>::clear();
@@ -154,10 +156,93 @@ void command::finalize()
 
 
 
+	template <>
+ baseType *  command ::retrieve<baseType> (string s)
+{
+	if (!contextCheck (s, _baseType_))
+		throw (s +"ContextError!").c_str();
+	else
+		return baseTypeVar[s];
+
+}
+
+template <>  bool *  command ::retrieve<bool> (string s)
+{
+	if (!contextCheck (s, _bool_))
+		throw (s +"ContextError!").c_str();
+	else
+		return boolVar[s];
+
+}
+
+template <>  int *  command ::retrieve<int> (string s)
+{
+	if (!contextCheck (s, _int_))
+		throw (s +"ContextError!").c_str();
+	else
+		return intVar[s];
+
+}
+
+	template <>
+ string *  command ::retrieve<string> (string s)
+{
+	if (!contextCheck (s, _string_))
+		throw (s +"ContextError!").c_str();
+	else
+		return stringVar[s];
+
+}
+
+
+	template <>
+ networkTemplate *  command::retrieve<networkTemplate> (string s)
+{
+	if (!contextCheck (s, _network_))
+	{
+		cout << "ContextError!" << endl;
+		cout << "NetworkTemplate:" << s << endl;
+		exit(1);
+	}
+	else
+		return networkVar[s];
+
+}
+
+	template <>
+ nodeBlueprint**  command::retrieve<nodeBlueprint *> (string s)
+{
+	if (!contextCheck (s, _node_))
+	{
+
+		cout << "ContextError!" << endl;
+		cout << "NodeTemplate:" << s << endl;
+		exit(1);
+	}
+	else
+		return nodeVar[s];
+
+}
+
+	template <>
+ edgeBlueprint**  command::retrieve<edgeBlueprint *> (string s)
+{
+	if (!contextCheck (s, _edge_))
+	{
+
+		cout << "ContextError!" << endl;
+		cout << "EdgeTemplate:" << s << endl;
+		exit(1);
+	}
+	else
+		return edgeVar[s];
+
+}
 
 
 
 
+//template networkTemplate* command::retrieve<networkTemplate> (string s);
 
 
 

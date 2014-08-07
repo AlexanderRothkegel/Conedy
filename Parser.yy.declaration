@@ -251,7 +251,6 @@ dynNetworkCommand:
 | NETWORK '.' STARTINGCONDITIONSMALLDISTURBANCE '(' baseType ',' integer ',' integer ',' random ')'
   { function<baseType ()> r = bind(&expression<baseType>::evaluate,$11);
 	 $$ = NETWORKFUNK4(smallDisturbance,$1,_E(baseType,$5), _E(int,$7), _E(int,$9), r); }
-| NETWORK '.' DYNAMICS '(' nodeDescriptor ')' { $$=NETWORKFUNK1(dynamics, $1, _E(nodeDescriptor, $5)); }
 | NETWORK '.' SETSTATE '(' nodeDescriptor ',' argList ')' {$$ = NETWORKFUNK2(setInitialConditionVec, $1, _E(nodeDescriptor, $5), bind(&expressionVector<baseType>::evaluate, $7)); };
 
 string :	STRING       {  std::string s(d_scanner.YYText()+1, strlen(d_scanner.YYText()) - 2); $$ =  new constantCommand<string>(s);}
@@ -328,13 +327,9 @@ createLink : link
 
 
 
-link	:  DELAYLINK '(' integer ')' {edgeBlueprint *l = new delayEdge($3->evaluate()); $$ = new constantCommand<edgeBlueprint*>(l); }
-
-| PULSECOUPLEEDGE'(' baseType ')' {edgeBlueprint *l = new stepEdge< edgeVirtual>   ($3->evaluate()); $$ = new constantCommand<edgeBlueprint*>(l); }
-		| PULSECOUPLEDELAYEDGE'(' baseType ',' baseType ')' {edgeBlueprint *l = new pulsecoupleDelayEdge($3->evaluate(), $5->evaluate()); $$ = new constantCommand<edgeBlueprint*>(l); }
 
 
-| WEIGHTEDEDGE  { edgeBlueprint *l = new weightedEdgeVirtual(); $$ = new constantCommand<edgeBlueprint*>(l); }
+link :  WEIGHTEDEDGE  { edgeBlueprint *l = new weightedEdgeVirtual(); $$ = new constantCommand<edgeBlueprint*>(l); }
 		| EDGE { edgeBlueprint *l = new edgeVirtual(); $$ = new constantCommand<edgeBlueprint*>(l); }
 		| STATICWEIGHTEDEDGE { edgeBlueprint *l = new staticWeightedEdgeVirtual();$$ = new constantCommand<edgeBlueprint*>(l);  }
 

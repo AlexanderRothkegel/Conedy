@@ -18,7 +18,6 @@
 
 
 using namespace std;
-using namespace conedy;
 
 //typedef dynNode nodeBlueprint;
 //typedef edgeVirtual edgeBlueprint;
@@ -34,9 +33,9 @@ class networkTemplate;
 
 
 
-typedef dynNode nodeBlueprint;
-typedef edgeVirtual edgeBlueprint;
-
+typedef conedy::dynNode nodeBlueprint;
+typedef conedy::edgeVirtual edgeBlueprint;
+typedef conedy::networkTemplate networkTemplate; 
 
 
 
@@ -56,7 +55,7 @@ class command
 		static map < string, nodeBlueprint ** > nodeVar;
 		static map < string, edgeBlueprint ** > edgeVar;
 		static map < string, string * > stringVar;
-		static map < string, nodeDescriptor*> nodeDescriptorVar;
+		static map < string, conedy::nodeDescriptor*> nodeDescriptorVar;
 
 		static vector <string> inputFiles;
 
@@ -159,89 +158,14 @@ class instruction : public command
 //! Basis-Klasse für Ausdrücke im Parser-Baum vom Typ T
 
 
-	template <>
-inline baseType *  command ::retrieve<baseType> (string s)
-{
-	if (!contextCheck (s, _baseType_))
-		throw (s +"ContextError!").c_str();
-	else
-		return baseTypeVar[s];
+template <> baseType *  command ::retrieve<baseType> (string s);
 
-}
-
-template <> inline bool *  command ::retrieve<bool> (string s)
-{
-	if (!contextCheck (s, _bool_))
-		throw (s +"ContextError!").c_str();
-	else
-		return boolVar[s];
-
-}
-
-template <> inline int *  command ::retrieve<int> (string s)
-{
-	if (!contextCheck (s, _int_))
-		throw (s +"ContextError!").c_str();
-	else
-		return intVar[s];
-
-}
-
-	template <>
-inline string *  command ::retrieve<string> (string s)
-{
-	if (!contextCheck (s, _string_))
-		throw (s +"ContextError!").c_str();
-	else
-		return stringVar[s];
-
-}
-
-
-	template <>
-inline networkTemplate *  command::retrieve<networkTemplate> (string s)
-{
-	if (!contextCheck (s, _network_))
-	{
-		cout << "ContextError!" << endl;
-		cout << "NetworkTemplate:" << s << endl;
-		exit(1);
-	}
-	else
-		return networkVar[s];
-
-}
-
-	template <>
-inline nodeBlueprint**  command::retrieve<nodeBlueprint *> (string s)
-{
-	if (!contextCheck (s, _node_))
-	{
-
-		cout << "ContextError!" << endl;
-		cout << "NodeTemplate:" << s << endl;
-		exit(1);
-	}
-	else
-		return nodeVar[s];
-
-}
-
-	template <>
-inline edgeBlueprint**  command::retrieve<edgeBlueprint *> (string s)
-{
-	if (!contextCheck (s, _edge_))
-	{
-
-		cout << "ContextError!" << endl;
-		cout << "EdgeTemplate:" << s << endl;
-		exit(1);
-	}
-	else
-		return edgeVar[s];
-
-}
-
+template <> bool *  command ::retrieve<bool> (string s);
+template <>  int *  command ::retrieve<int> (string s);
+template <>  string *  command ::retrieve<string> (string s);
+template <>  networkTemplate *  command::retrieve<networkTemplate> (string s);
+template <>  nodeBlueprint**  command::retrieve<nodeBlueprint *> (string s);
+template <>  edgeBlueprint**  command::retrieve<edgeBlueprint *> (string s);
 
 
 #endif

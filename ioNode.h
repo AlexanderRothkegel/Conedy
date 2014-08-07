@@ -17,16 +17,17 @@
 #include <iomanip>
 #include <map>
 #include "globals.h"
+#include "nodeImplement.h"
 
 #include <boost/iostreams/device/file_descriptor.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/device/file.hpp>
-namespace io = boost::iostreams;
 using namespace std;
-// using namespace boost::iostreams::zlib;
-// using namespace boost;
-using namespace boost::iostreams;
+
+
+namespace io = boost::iostreams;
+//using namespace boost::iostreams;
 
 
 
@@ -37,7 +38,7 @@ using namespace boost::iostreams;
 namespace conedy
 {
 
-	class streamOutNodeBinary : public dynNode, private globals
+	class streamOutNodeBinary : public nodeVirtualEdges<dynNode>, private globals
 	{
 
 		protected:
@@ -68,8 +69,9 @@ namespace conedy
 			//! Ausgabenodes brauchen keinen Speicherplatz von dynNode reserviert zu bekommen -> dimension = 0
 			virtual const unsigned int dimension() const { return 0;}
 
-			streamOutNodeBinary ( networkElementType n ) : dynNode( n ) {};
+			streamOutNodeBinary ( networkElementType n ) : nodeVirtualEdges<dynNode>( n ) {};
 
+			node * construct () { return new streamOutNodeBinary ( *this ); }
 
 
 			virtual ~streamOutNodeBinary();
@@ -82,7 +84,7 @@ namespace conedy
 
 
 
-			streamOutNodeBinary ( const streamOutNodeBinary& n ) : dynNode  (n) { localStreamNumber = n.localStreamNumber; counter[localStreamNumber]++; }
+			streamOutNodeBinary ( const streamOutNodeBinary& n ) : nodeVirtualEdges<dynNode>  (n) { localStreamNumber = n.localStreamNumber; counter[localStreamNumber]++; }
 			streamOutNodeBinary ( string s, networkElementType n = _streamOutNodeBinary_ );
 			//		virtual void streamOut(outStream & out);
 			//		streamOutNodeBinary(string s, string command);
@@ -92,7 +94,7 @@ namespace conedy
 
 
 	//! Klasse, die Werte in Dateien wegschreibt. Verwendet Boost-iostreamm damit Dateien direkt on-the-fly gezipt werden können. Die Ausgabeobjekte werden statisch verwaltet, damit verschiedene Nodes in dieselbe Datei schreiben können.
-	class streamOutNode : public dynNode, public globals
+	class streamOutNode : public nodeVirtualEdges<dynNode>, public globals
 	{
 
 		public:
@@ -132,24 +134,17 @@ namespace conedy
 			//! Ausgabenodes brauchen keinen Speicherplatz von dynNode reserviert zu bekommen -> dimension = 0
 			virtual const unsigned int dimension() const { return 0;}
 
-			streamOutNode ( networkElementType n ) : dynNode( n ) {};
-
+			streamOutNode ( networkElementType n ) : nodeVirtualEdges<dynNode>( n ) {};
+			node * construct () { return new streamOutNode ( *this ); }
 
 			virtual ~streamOutNode();
 			virtual void evolve(baseType time) ;
-			virtual node *construct()
-			{ 
-				if (getGlobal<bool>("inputCompress"))
-				{
-					streamOutNodeBinary * blueprint = new streamOutNodeBinary(stringOfStreamNumber[localStreamNumber]);
-					return new streamOutNodeBinary (* blueprint );
-					delete blueprint;
-				}
-				else
-					return new streamOutNode(*this);
-			}
+//			virtual node *construct()
+//			{ 
+//					return new streamOutNode(*this);
+//			}
 
-			streamOutNode ( const streamOutNode& n ) : dynNode  (n) { localStreamNumber = n.localStreamNumber; counter[localStreamNumber]++; }
+			streamOutNode ( const streamOutNode& n ) : nodeVirtualEdges<dynNode>  (n) { localStreamNumber = n.localStreamNumber; counter[localStreamNumber]++; }
 			streamOutNode ( string s, networkElementType n = _streamOutNode_ );
 			//		virtual void streamOut(outStream & out);
 			//		streamOutNode(string s, string command);
@@ -167,6 +162,9 @@ namespace conedy
 		streamOutNodeCountEquals ( networkElementType n ) : streamOutNode( n ), lastValue (0.0), count (0) {};
 		streamOutNodeCountEquals ( string s, networkElementType n = _streamOutNode_ ) : streamOutNode(s, n) {};
 		virtual void evolve (baseType time);	
+
+		node * construct () { return new streamOutNodeCountEquals (*this); }
+
 	};
 	
 	
@@ -180,6 +178,7 @@ namespace conedy
 				registerGlobal<int> ("streamOutNodeHist_bins", 200);
 			}
 
+		node * construct () { return new streamOutNodeHist (*this); }
 
 		streamOutNodeHist ( networkElementType n ) : streamOutNode( n ) {} 
 		streamOutNodeHist ( string s, networkElementType n = _streamOutNode_) : streamOutNode(s, n) {};
@@ -190,7 +189,7 @@ namespace conedy
 	//! Klasse, die Werte in Dateien wegschreibt. Verwendet Boost-iostreamm damit Dateien direkt on-the-fly gezipt werden können. Die Ausgabeobjekte werden statisch verwaltet, damit verschiedene Nodes in dieselbe Datei schreiben können.
 
 	//! Knoten, der die vektorielle Summe Targetstates zurückgibt.
-	class calculateMeanPhaseCoherence : public dynNode
+	class calculateMeanPhaseCoherence : public nodeVirtualEdges<dynNode>
 
 		{
 
@@ -199,8 +198,8 @@ namespace conedy
 			virtual bool timeEvolution() { return 0; }
 			virtual const nodeInfo getNodeInfo() { nodeInfo n = {_calculateMeanPhaseCoherence_,0,"calculateMeanPhaseCoherence"};     return n; };
 			virtual const unsigned int dimension() const { return 0;}
-
-			calculateMeanPhaseCoherence() : dynNode(_calculateMeanPhaseCoherence_) {};
+			node * construct () { return new calculateMeanPhaseCoherence (*this); }
+			calculateMeanPhaseCoherence() : nodeVirtualEdges<dynNode>(_calculateMeanPhaseCoherence_) {};
 			virtual void clean () {};
 			virtual baseType getState();
 	};
@@ -208,15 +207,16 @@ namespace conedy
 
 
 		//! Berechnet die mittlere Phase der angekopplten Knoten aus.
-	class calculateMeanPhase : public dynNode
+	class calculateMeanPhase : public nodeVirtualEdges<dynNode>
 	{
 		public:
 
 			virtual bool timeEvolution() { return 0; }
 			virtual const nodeInfo getNodeInfo() { nodeInfo n = {_calculateMeanPhase_,_dynNode_|_inNode_,"calculateMeanPhase"};     return n; };
 			virtual const unsigned int dimension() const { return 0;}
+			node * construct () { return new calculateMeanPhase (*this); }
 
-			calculateMeanPhase() : dynNode(_calculateMeanPhase_) {};
+			calculateMeanPhase() : nodeVirtualEdges<dynNode>(_calculateMeanPhase_) {};
 			virtual void clean () {};
 			virtual baseType getState();
 	};
@@ -224,7 +224,7 @@ namespace conedy
 
 
 	//! Eingabe-node, der Werte aus einer Datei liest und bei Aufruf von getState zurückgibt.
-	class streamInNode : public dynNode, private globals
+	class streamInNode : public nodeVirtualEdges<dynNode>, private globals
 
 	{
 
@@ -246,8 +246,9 @@ namespace conedy
 			}
 			virtual const unsigned int dimension() const { return 1;}
 
-			streamInNode ( networkElementType n ) : dynNode ( n, 1 ) {};
+			streamInNode ( networkElementType n ) : nodeVirtualEdges<dynNode> ( n, 1 ) {};
 
+			virtual node * construct() { return new streamInNode (*this); }
 
 			virtual ~streamInNode();
 			//			streamInNode ( outStream &o, int i ) : node ( i, _streamInNode_ )  {};
@@ -257,7 +258,7 @@ namespace conedy
 
 
 
-			streamInNode ( const streamInNode& n ) : dynNode(n) { localStreamNumber = n.localStreamNumber; counter[localStreamNumber]++; }
+			streamInNode ( const streamInNode& n ) : nodeVirtualEdges<dynNode>(n) { localStreamNumber = n.localStreamNumber; counter[localStreamNumber]++; }
 			streamInNode ( string s, networkElementType n = _streamInNode_ );
 			//		virtual void streamIn(outStream & out);
 			//		streamInNode(string s, string command);

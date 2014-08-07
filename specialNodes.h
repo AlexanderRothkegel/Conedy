@@ -14,7 +14,7 @@ namespace conedy
 
 
 
-	class eventCountNode : public dynNode
+	class eventCountNode : public nodeVirtualEdges<dynNode>
 	{
 		private:
 			unsigned int signature;
@@ -24,8 +24,9 @@ namespace conedy
 			virtual const nodeInfo getNodeInfo() { nodeInfo n = {_eventCountNode_,_outNode_,"eventCountNode"};     return n; };
 
 			virtual const unsigned int dimension() const{ return 0;}
+			node * construct () { return new eventCountNode ( *this ); }
 
-			eventCountNode(unsigned int theSignature) :  dynNode ( _eventCountNode_ ), signature(theSignature){};
+			eventCountNode(unsigned int theSignature) :  nodeVirtualEdges<dynNode> ( _eventCountNode_ ), signature(theSignature){};
 			virtual void clean () {};
 			virtual baseType getState()
 			{	
@@ -39,7 +40,7 @@ namespace conedy
 
 	//! Node, der die momentane Integrationszeit als status zurückgibt
 	template <typename T>
-		class timeNode : public dynNode 
+		class timeNode : public nodeVirtualEdges<dynNode>
 
 
 	{
@@ -49,8 +50,9 @@ namespace conedy
 			virtual const nodeInfo getNodeInfo() { nodeInfo n = {_timeNode_,_outNode_ ,  "timeNode"};     return n; };
 
 			virtual const unsigned int dimension() const{ return 0;}
+			node * construct () { return new timeNode (*this); }
 
-			timeNode() : dynNode ( _timeNode_ ) {};
+			timeNode() : nodeVirtualEdges<dynNode> ( _timeNode_ ) {};
 			virtual void clean () {};
 			virtual T getState()
 			{
@@ -92,7 +94,7 @@ namespace conedy
 			complex<double> sum (( double)0, (double)0);
 			for (ei = el.begin(); ei != el.end();ei ++)
 			{
-				d =	(node::theNodes[ei->first]->getState()  )  -  ( node::theNodes[ei->second] ->getState()  );
+				d =	(dynNode::lookUp(ei->first)-> getState()  )  -  ( dynNode::lookUp(ei->second) ->getState()  );
       		complex<double> dummy (( double)0, d * 2 * M_PI);
 		      sum = sum + exp (dummy);
 			}	
@@ -128,7 +130,7 @@ namespace conedy
 			baseType sum = 0;
 			for (ei = el.begin(); ei != el.end();ei ++)
 			{
-				d =	(node::theNodes[ei->first]->getState()  )  -  ( node::theNodes[ei->second] ->getState()  );
+				d =	(dynNode::lookUp(ei->first)->getState() - dynNode::lookUp(ei->second)->getState());
 					if (abs(d) < abs(1.0-abs(d)))
 						d = abs(d);
 					else

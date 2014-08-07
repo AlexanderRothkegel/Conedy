@@ -1,7 +1,6 @@
 #ifndef baseType_h
 	#define baseType_h baseType_h
 
-	//using namespace boost;
 
 
 

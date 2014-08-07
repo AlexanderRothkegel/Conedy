@@ -26,18 +26,24 @@ namespace conedy
 
 			sdeNode ( networkElementType n, unsigned int dim) : containerNode<baseType, 4> ( n, dim ) { }
 
-			virtual void operator()(baseType x[], baseType  dxdt[], baseType s[], baseType dsdx []) {throw "differential equation not defined for";};
+			virtual void sdgl(baseType x[], baseType  dxdt[], baseType s[], baseType dsdx []) {throw "differential equation not defined for";};
 
-			static void dgl (baseType *x, baseType* dxdt, baseType *s, baseType *dsdx )
+			void operator()(baseType x[], baseType  dxdt[], baseType s[], baseType dsdx []) {fullSdgl(x,dxdt,s,dsdx);} 
+
+
+			static void fullSdgl (baseType *x, baseType* dxdt, baseType *s, baseType *dsdx )
 
 			{
 				list<containerNode<baseType,4>*>::iterator it;
-				for ( it = nodeList.begin(); it != nodeList.end();it++ )
-					( * ( (sdeNode *)*it )) ( &x[ ( *it )->startPosGslOdeNodeArray], &dxdt[ ( *it )->startPosGslOdeNodeArray] , &s[ (*it)->startPosGslOdeNodeArray], &dsdx[ (*it)->startPosGslOdeNodeArray] ) ;
+				for ( it = nodeList.begin(); it != nodeList.end();++it)
+					 ((sdeNode *)*it )->sdgl ( &x[ ( *it )->startPosInContainerNodeArray], 
+						 								&dxdt[ ( *it )->startPosInContainerNodeArray] , 
+														&s[ (*it)->startPosInContainerNodeArray], 
+														&dsdx[ (*it)->startPosInContainerNodeArray] ) ;
 			}
 
 
-
+			
 
 
 

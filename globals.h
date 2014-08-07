@@ -134,7 +134,7 @@ class globals
 				}
 			}
 			else
-				params<T>::setStandard (name, d);
+				conedy::params<T>::setStandard (name, d);
 		}
 };
 

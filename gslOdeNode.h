@@ -131,7 +131,7 @@ namespace conedy
 						);
 
 					gslEvolve = gslode(evolve_alloc) (odeDimension);
-					gslode(system) sys = {&gslOdeNode::dgl, NULL, odeDimension, NULL};
+					gslode(system) sys = {&gslOdeNode::fullDgl, NULL, odeDimension, NULL};
 					gslOdeSys = sys; //{NULL,NULL,usedIndices, NULL};
 				}
 			}
@@ -143,7 +143,7 @@ namespace conedy
 				cout << this->dimension() << endl;
 
 				double  * dxdt = (double*) calloc (this->dimension(), sizeof(double));
-				(*(this))(x, dxdt);
+				dgl(x, dxdt);
 				for (unsigned int i = 0; i < this->dimension(); i++)
 					cout << i <<   setprecision (15) << " " << dxdt[i] << endl;
 
@@ -164,7 +164,7 @@ namespace conedy
 //				containerNode<baseType,1>::dynamicVariablesOfAllDynNodes = originalNodeStates;
 //			}
 //
-			virtual node *construct() { return new node ( *this ); };
+			virtual node *construct() = 0;
 
 	};
 

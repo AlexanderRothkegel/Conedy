@@ -23,7 +23,7 @@ namespace conedy
 			bool isConnected();
 
 			//! returns the degree of node v
-			nodeDescriptor degree (nodeDescriptor v) { return node::theNodes[v]->degree(); }
+			nodeDescriptor degree (nodeDescriptor v) { return dynNode::lookUp(v)->degree(); }
 
 			//! returns the mean degree of the network
 			baseType meanDegree ();
