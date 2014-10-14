@@ -1,0 +1,6 @@
+network N;
+N.cycle(100, 10, pcoMirollo(), weightedEdge(1.0));
+N.observePhaseCoherence("test.dat");
+N.evolve(0.0, 1.0);
+N.removeRandomEdges(0.01, weightedEdge(1.0));
+N.evolve(1.0, 2.0);
