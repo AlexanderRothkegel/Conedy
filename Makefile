@@ -158,8 +158,8 @@ unstripped: clean addNodes Scanner.ll Parser.yy
 
 # build the bison-flex-interpreter of Conedy.     fix to the strange behavior of statically linking stdc++
 conedy: addNodesIfNecessary Parser.yy Scanner.ll string_config.h
-	bjam  conedy cflags=-D$(SVNDEV) $(addprefix cflags=-D,${defines})  cflags='-DARCHITECTURE="${ARCH}"'  -j${numberCores} -n  | grep "end-group" | sed "s/-Wl,-Bstatic/-static/g;s/-Wl,-Bdynamic//g;" > linkStatic.sh
-	bjam  conedy cflags=-D$(SVNDEV) $(addprefix cflags=-D,${defines})  cflags='-DARCHITECTURE="${ARCH}"'  -j${numberCores}
+	bjam  conedy --cxxflags=-std=gnu++98 --cxxflags=fpermissive --cxxflags=-w --cxxflags=-D$(SVNDEV) $(addprefix --cxxflags=-D,${defines})  --cxxflags='-DARCHITECTURE="${ARCH}"'  -j${numberCores} -n  | grep "end-group" | sed "s/-Wl,-Bstatic/-static/g;s/-Wl,-Bdynamic//g;" > linkStatic.sh
+	bjam  conedy --cxxflags=-std=gnu++98 --cxxflags=fpermissive --cxxflags=-w --cxxflags=-D$(SVNDEV) $(addprefix --cxxflags=-D,${defines})  --cxxflags='-DARCHITECTURE="${ARCH}"'  -j${numberCores}
 	bash linkStatic.sh
 	rm linkStatic.sh
 
@@ -176,7 +176,7 @@ conedy.install: conedy
 	sed -i "s+/etc/conedy.config+${globalConfig}+g"   ${dirInstall}/recompileConedy
 
 conedy-root: addSharedNodesIfNecessary Parser.yy Scanner.ll string_config.h
-	bjam  conedy cflags=-D$(SVNDEV) $(addprefix cflags=-D,${defines})  cflags=-D"ARCHITECTURE=${ARCH}"  -j${numberCores}
+	bjam  conedy --cxxflags=-std=gnu++98 --cxxflags=fpermissive --cxxflags=-w --cxxflags=-D$(SVNDEV) $(addprefix --cxxflags=-D,${defines})  --cxxflags=-D"ARCHITECTURE=${ARCH}"  -j${numberCores}
 
 conedy-root.clean: conedy.clean
 
@@ -203,7 +203,7 @@ conedy.uninstall:
 
 
 python-conedy: addNodesIfNecessary docstrings.h docstringsNodes.h string_config.h # build the python bindings of Conedy.
-	CFLAGS="-D$(SVNDEV) -DPYTHON $(addprefix -D,${defines})" python setup.py build
+	CFLAGS="-w -fpermissive -std=gnu++98 -D$(SVNDEV) -DPYTHON $(addprefix -D,${defines})" python setup.py build
 
 python-conedy-root.clean: python-conedy.clean
 
@@ -216,7 +216,7 @@ python-conedy.install: python-conedy
 
 
 python-conedy-root: addSharedNodesIfNecessary docstrings.h docstringsNodes.h string_config.h
-	CFLAGS="-D$(SVNDEV) -DPYTHON $(addprefix -D,${defines})" python setup.py build
+	CFLAGS="-w -fpermissive -std=gnu++98 -D$(SVNDEV) -DPYTHON $(addprefix -D,${defines})" python setup.py build
 
 
 python-conedy-root.install:
@@ -268,7 +268,7 @@ conedy-src.uninstall:
 python-conedy.recompile:
 	${noUserSpace} HOME=${HOME} make docstrings.h addNodesIfNecessary string_config.h
 ifdef pythonBjam
-	([ -d build ] && ${noUserSpace} HOME=${HOME} bjam  python-conedy  cflags=-D$(SVNDEV) $(addprefix cflags=-D,${defines}) cflags=-D"ARCHITECTURE=${ARCH}"  -j${numberCores} &&\
+	([ -d build ] && ${noUserSpace} HOME=${HOME} bjam  python-conedy --cxxflags=-std=gnu++98 --cxxflags=fpermissive --cxxflags=-w --cxxflags=-D$(SVNDEV) $(addprefix --cxxflags=-std=gnu++98 --cxxflags=fpermissive --cxxflags=-w --cxxflags=-D,${defines}) --cxxflags=-D"ARCHITECTURE=${ARCH}"  -j${numberCores} &&\
 			${noUserSpace} cp -f bin/gcc*/release/python-conedy.so build/lib*/conedy.so ) \
 		|| ( ${noUserSpace} make python-conedy python-conedy.install)
 endif
@@ -332,13 +332,13 @@ conedy-src.clean:
 
 
 win: string_config.h
-	bjam toolset=gcc-ming target-os=windows conedy  cflags=-D"ARCHITECTURE=win32" -j${numberCores}
+	bjam toolset=gcc-ming target-os=windows conedy  --cxxflags=-D"ARCHITECTURE=win32" -j${numberCores}
 
 documentation.uninstall:
 
 debug: addNodesIfNecessary Scanner.ll Parser.yy string_config.h
 #	bisonc++ Parser.yy
-	bjam conedyDebug cflags=-D$(SVNDEV) $(addprefix cflags=-D,${defines})  cflags=-D"ARCHITECTURE=${ARCH}"  -j${numberCores}
+	bjam conedyDebug --cxxflags=-std=gnu++98 --cxxflags=fpermissive --cxxflags=-w --cxxflags=-D$(SVNDEV) $(addprefix --cxxflags=-D,${defines})  --cxxflags=-D"ARCHITECTURE=${ARCH}"  -j${numberCores}
 
 
 debug.install: debug
@@ -365,7 +365,7 @@ condor.clean:
 #
 
 condor: addNodesIfNecessary string_config.h               # build an interpreter which does not execute network-functions, but creates Condor-scripts which distribute the execution of loops (see vectorFor)
-	bjam  conedyCondor cflags=-D$(SVNDEV) $(addprefix cflags=-D,${defines})  cflags=-D"ARCHITECTURE=${ARCH}"  -j${numberCores}  
+	bjam  conedyCondor --cxxflags=-std=gnu++98 --cxxflags=fpermissive --cxxflags=-w --cxxflags=-D$(SVNDEV) $(addprefix --cxxflags=-D,${defines})  --cxxflags=-D"ARCHITECTURE=${ARCH}"  -j${numberCores}  
 
 
 condor.recompile:
